@@ -1,12 +1,13 @@
 % layout 'dbviewer_common';
 <h2>Databases</h2>
-<ul>
-% for my $database (sort @$databases) {
-<li>
-  <a href="<%= url_for("/$prefix/tables")->query(database => $database) %>">
-    <%= $database %>
-    %= $current_database eq $database ? '(current)' : ''
-  </a>
-</li>
-% }
+
+<ul class="nav nav-list">
+  % for my $database (sort @$databases) {
+    <li>
+      <a href="<%= url_for("/$prefix/tables")->query(database => $database) %>">
+        <i class="icon-circle-arrow-right"></i> <%= $database %>
+        %= $current_database eq $database ? '(current)' : ''
+      </a>
+    </li>
+  % }
 </ul>

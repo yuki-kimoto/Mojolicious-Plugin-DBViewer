@@ -1,125 +1,32 @@
-<!doctype html><html>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
-<head>
-  <title>
-    % if (stash 'title') {
-      <%= stash('title') %>
-    % }
-    <%= $main_title %>
-  </title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  %= stylesheet '/css/bootstrap.css', rel => 'stylesheet', media => 'screen';
-  
-  %= javascript '/js/jquery-1.9.1.js';
-  %= javascript '/js/bootstrap.js';
-  
-  %= stylesheet begin 
-    *, body {
-      padding 0;
-      margin: 0;
-    }
+<!DOCTYPE html>
+<html>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
+  <head>
+    <title>
+      % if (stash 'title') {
+        <%= stash('title') %>
+      % }
+      <%= $main_title %>
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    %= stylesheet '/css/bootstrap.css', rel => 'stylesheet', media => 'screen';
     
-    #container {
-      padding-top: 15px;
-      padding-bottom: 15px;
-      padding-left: 15px;
-      padding-right: 15px;
-    }
+    %= javascript '/js/jquery-1.9.1.js';
+    %= javascript '/js/bootstrap.js';
     
-    h1 {
-      text-align: center;
-      font-size: 250%;
-      padding-top: 5px;
-      padding-bottom: 5px;
-      padding-left: 40px;
-      background-color: #F9F9FF
-    }
-
-    h2 {
-      font-size: 230%;
-      margin-bottom: 15px;
-      margin-left: 10px;
-    }
-
-    h3 {
-      font-size: 200%;
-      margin-bottom: 15px;
-      margin-left: 30px;
-    }
+    %= stylesheet begin
+      h1 {
+        text-align:center;
+      }
+    % end
     
-    ul {
-      margin-left: 8px;
-      font-size: 190%;
-      list-style-type: circle;
-    }
-    
-    li {
-      margin-bottom: 6px;
-    }
-    
-    a, a:visited {
-      color: #0000EE;
-      text-decoration: none;
-    }
-    
-    a:hover {
-      color: #EE0000;
-    }
-    
-    i {
-      color: #66CC77;
-      font-style: normal;
-      font-size: 95%;
-    }
-    
-    table {
-      border-collapse: collapse;
-      margin-left:35px;
-      margin-bottom:20px;
-    }
-    
-    table, td, th {
-      border: 1px solid #9999CC;
-      padding-left:7px;
-      padding-right:7px;
-      padding-top: 2px;
-      padding-bottom: 3px;
-    }
-    
-    div.totalcount {
-      margin-left:40px;
-      margin-bottom:10px;
-      font-size:160%;
-    }
-    div.pagenavi {
-      margin-left:70px;
-      margin-bottom:20px;
-      font-size: 145%;
-    }
-    
-    div.condition {
-      margin-left:40px;
-      margin-bottom:20px;
-      font-size: 145%;
-      padding: 5px;
-      background-color: #EEEEEE;
-    }
-
-    pre {
-      border: 1px solid #9999CC;
-      padding:15px;
-      margin-left:35px;
-      margin-bottom:20px;
-    }
-
-  % end
-  
-</head>
-<body>
-  <h1><a href="<%= "/$prefix" %>"><%= $main_title %></a></h1>
-  <hr>
-  <div id="container">
-    %= content;
-  </div>
-</body>
+  </head>
+  <body>
+    <h1><a href="<%= "/$prefix" %>"><%= $main_title %></a></h1>
+    <hr>
+    <div class="container">
+      %= content;
+    </div>
+    <div class="text-center"><a href="https://github.com/yuki-kimoto/Mojolicious-Plugin-DBViewer">Mojolicious::Plugin::DBViewer</a></div>
+  </body>
 </html>
