@@ -139,6 +139,10 @@ sub register {
 
 Mojolicious::Plugin::DBViewer - Mojolicious plugin to display MySQL database information on browser
 
+=head1 CAUTION
+
+B<This module is alpha release. the feature will be changed without warnings.>
+
 =head1 SYNOPSYS
 
   # Mojolicious::Lite
@@ -255,5 +259,18 @@ It is useful when C<under> is used.
   user => 'kimoto'
 
 Database user.
+
+=head1 BACKWARDS COMPATIBILITY POLICY
+
+If a feature is DEPRECATED, you can know it by DEPRECATED warnings.
+DEPRECATED feature is removed after C<five years>,
+but if at least one person use the feature and tell me that thing
+I extend one year each time he tell me it.
+
+DEPRECATION warnings can be suppressed
+by C<MOJOLICIOUS_PLUGIN_DBVIEWER_DEPRECATION>
+environment variable.
+
+EXPERIMENTAL features will be changed without warnings.
 
 =cut

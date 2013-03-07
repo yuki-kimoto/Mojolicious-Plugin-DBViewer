@@ -1,2 +1,4 @@
 0.01 (alpha release)
-  - First release.
+  - First release
+  - Mojolicious::Plugin::MySQLViewerLite and
+    Mojolicious::Plugin::SQLiteViewerLite is merged into this module.
