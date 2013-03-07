@@ -18,15 +18,6 @@ has 'dbi';
 
 sub _driver { lc shift->dbi->dbh->{Driver}->{Name} }
 
-sub add_template_path {
-  my ($self, $renderer, $class) = @_;
-  $class =~ s/::/\//g;
-  $class .= '.pm';
-  my $public = abs_path $INC{$class};
-  $public =~ s/\.pm$//;
-  push @{$renderer->paths}, "$public/templates";
-}
-
 sub register {
   my ($self, $app, $conf) = @_;
   
@@ -73,8 +64,14 @@ sub register {
   else { croak "Mojolicious::Plugin::DBViewer don't support $driver" }
   $self->command($command);
   
-  # Add template path
-  $self->add_template_path($app->renderer, __PACKAGE__);
+  # Add public and template path
+  my $class = __PACKAGE__;
+  $class =~ s/::/\//g;
+  $class .= '.pm';
+  my $base_path = abs_path $INC{$class};
+  $base_path =~ s/\.pm$//;
+  push @{$app->static->paths}, "$base_path/public";
+  push @{$app->renderer->paths}, "$base_path/templates";
   
   # Routes
   my $r = $conf->{route} // $app->routes;

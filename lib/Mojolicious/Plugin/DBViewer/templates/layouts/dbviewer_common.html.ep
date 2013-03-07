@@ -7,7 +7,12 @@
     % }
     <%= $main_title %>
   </title>
-  %= javascript '/js/jquery.js'
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  %= stylesheet '/css/bootstrap.css', rel => 'stylesheet', media => 'screen';
+  
+  %= javascript '/js/jquery-1.9.1.js';
+  %= javascript '/js/bootstrap.js';
+  
   %= stylesheet begin 
     *, body {
       padding 0;
