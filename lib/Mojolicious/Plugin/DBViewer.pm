@@ -7,6 +7,7 @@ use Cwd 'abs_path';
 use Mojolicious::Plugin::DBViewer::Command;
 use DBIx::Custom;
 use Validator::Custom;
+use Carp 'croak';
 
 our $VERSION = '0.01';
 
@@ -14,6 +15,8 @@ has 'command';
 has 'prefix';
 has 'validator';
 has 'dbi';
+
+sub _driver { lc shift->dbi->dbh->{Driver}->{Name} }
 
 sub add_template_path {
   my ($self, $renderer, $class) = @_;
@@ -39,6 +42,9 @@ sub register {
     connector => 1
   );
   $self->dbi($dbi);
+  if (ref $conf->{connector_get} eq 'SCALAR') {
+    ${$conf->{connector_get}} = $dbi->connector;
+  }
   
   # Validator
   my $validator = Validator::Custom->new;
@@ -50,10 +56,21 @@ sub register {
   );
   $self->validator($validator);
   
-  # Commaned
-  require Mojolicious::Plugin::DBViewer::MySQL::Command;
-  my $command
-    = Mojolicious::Plugin::DBViewer::MySQL::Command->new(dbi => $dbi);
+  # Commaned and namespace
+  my $driver = $self->_driver;
+  my $command;
+  my $namespace;
+  if ($driver eq 'mysql') {
+    require Mojolicious::Plugin::DBViewer::MySQL::Command;
+    $command = Mojolicious::Plugin::DBViewer::MySQL::Command->new(dbi => $dbi);
+    $namespace = 'Mojolicious::Plugin::DBViewer::MySQL';
+  }
+  elsif ($driver eq 'sqlite') {
+    require Mojolicious::Plugin::DBViewer::SQLite::Command;
+    $command = Mojolicious::Plugin::DBViewer::SQLite::Command->new(dbi => $dbi);
+    $namespace = 'Mojolicious::Plugin::DBViewer::SQLite';
+  }
+  else { croak "Mojolicious::Plugin::DBViewer don't support $driver" }
   $self->command($command);
   
   # Add template path
@@ -63,38 +80,56 @@ sub register {
   my $r = $conf->{route} // $app->routes;
   $self->prefix($prefix);
   {
+    # Config
     my $r = $r->route("/$prefix")->to(
       'dbviewer#',
-      namespace => 'Mojolicious::Plugin::DBViewer::MySQL',
+      namespace => $namespace,
       plugin => $self,
       prefix => $self->prefix,
       main_title => 'DBViewer',
+      driver => $driver
     );
     
+    # Default
     $r->get('/')->to('#default');
-    $r->get('/tables')->to(
-      '#tables',
-      utilities => [
-        {path => 'showcreatetables', title => 'Show create tables'},
-        {path => 'showselecttables', title => 'Show select tables'},
-        {path => 'showprimarykeys', title => 'Show primary keys'},
-        {path => 'shownullallowedcolumns', title => 'Show null allowed columns'},
+    
+    # Tables
+    my $utilities = [
+      {path => 'showcreatetables', title => 'Show create tables'},
+      {path => 'showselecttables', title => 'Show select tables'},
+      {path => 'showprimarykeys', title => 'Show primary keys'},
+      {path => 'shownullallowedcolumns', title => 'Show null allowed columns'},
+    ];
+    if ($driver eq 'mysql') {
+      push @$utilities,
         {path => 'showdatabaseengines', title => 'Show database engines'},
         {path => 'showcharsets', title => 'Show charsets'}
-      ]
-    );
+    }
+    $r->get('/tables')->to('#tables', utilities => $utilities);
+    
+    # Table
     $r->get('/table')->to('#table');
+    
+    # Show create tables
     $r->get('/showcreatetables')->to('#showcreatetables');
+    
+    # Show select tables
     $r->get('/showselecttables')->to('#showselecttables');
+    
+    # Show primary keys
     $r->get('/showprimarykeys')->to('#showprimarykeys');
+    
+    # Show null allowed columns
     $r->get('/shownullallowedcolumns')->to('#shownullallowedcolumns');
-    $r->get('/showdatabaseengines')->to('#showdatabaseengines');
-    $r->get('/showcharsets')->to('#showcharsets');
+    
+    # Select
     $r->get('/select')->to('#select');
-
-    # Routes (MySQL specific)
-    $r->get('/showdatabaseengines')->to('#showdatabaseengines');
-    $r->get('/showcharsets')->to('#showcharsets');
+    
+    # MySQL Only
+    if ($driver eq 'mysql') {
+      $r->get('/showdatabaseengines')->to('#showdatabaseengines');
+      $r->get('/showcharsets')->to('#showcharsets');
+    }
   }
 }
 
@@ -164,6 +199,17 @@ Display C<primary keys>, C<null allowed columnes>, C<database engines> and C<cha
 =back
 
 =head1 OPTIONS
+
+=head2 connector_get
+
+  connector_get => \$connector
+
+Get L<DBIx::Connector> object internally used.
+  
+  # Get database handle
+  my $connector;
+  plugin('DBViewer', ..., connector_get => \$connector);
+  my $dbh = $connector->dbh;
 
 =head2 dsn
 
