@@ -71,35 +71,41 @@ $dbi->insert({column1_1 => 3, column1_2 => 4}, table => 'table1');
 
 # Test1.pm
 {
-    package Test1;
-    use Mojolicious::Lite;
-    plugin 'MySQLViewerLite', dbh => $dbi->dbh;
+  package Test1;
+  use Mojolicious::Lite;
+  plugin(
+    'DBViewer',
+    dsn => $dsn,
+    user => $user,
+    password => $password
+  );
 }
+
 my $app = Test1->new;
 my $t = Test::Mojo->new($app);
 
 # Top page
-$t->get_ok('/mysqlviewerlite')->content_like(qr/$database\s+\(current\)/);
+$t->get_ok('/dbviewer')->content_like(qr/$database\s+\(current\)/);
 
 # Tables page
-$t->get_ok("/mysqlviewerlite/tables?database=$database")
+$t->get_ok("/dbviewer/tables?database=$database")
   ->content_like(qr/table1/)
   ->content_like(qr/table2/)
   ->content_like(qr/table3/)
   ->content_like(qr/Show primary keys/)
   ->content_like(qr/Show null allowed columns/)
   ->content_like(qr/Show database engines/);
-$t->link_ok("/mysqlviewerlite/tables?database=$database");
+$t->link_ok("/dbviewer/tables?database=$database");
 
 # Table page
-$t->get_ok("/mysqlviewerlite/table?database=$database&table=table1")
+$t->get_ok("/dbviewer/table?database=$database&table=table1")
   ->content_like(qr/show create table/)
   ->content_like(qr/column1_1/)
   ->content_like(qr/column1_2/);
-$t->link_ok("/mysqlviewerlite/table?database=$database&table=table1");
+$t->link_ok("/dbviewer/table?database=$database&table=table1");
 
 # Select page
-$t->get_ok("/mysqlviewerlite/select?database=$database&table=table1")
+$t->get_ok("/dbviewer/select?database=$database&table=table1")
   ->content_like(qr#\Qselect * from <i>table1</i>#)
   ->content_like(qr/column1_1/)
   ->content_like(qr/column1_2/)
@@ -108,7 +114,7 @@ $t->get_ok("/mysqlviewerlite/select?database=$database&table=table1")
   ->content_like(qr/3/)
   ->content_like(qr/4/);
 
-$t->get_ok("/mysqlviewerlite/select?database=$database&table=table1&condition_column=column1_2&condition_value=4")
+$t->get_ok("/dbviewer/select?database=$database&table=table1&condition_column=column1_2&condition_value=4")
   ->content_like(qr#\Qselect * from <i>table1</i>#)
   ->content_like(qr/column1_1/)
   ->content_like(qr/column1_2/)
@@ -117,7 +123,7 @@ $t->get_ok("/mysqlviewerlite/select?database=$database&table=table1&condition_co
   ->content_like(qr/\b4\b/);
 
 # Show create tables page
-$t->get_ok("/mysqlviewerlite/showcreatetables?database=$database")
+$t->get_ok("/dbviewer/showcreatetables?database=$database")
   ->content_like(qr/Create tables/)
   ->content_like(qr/table1/)
   ->content_like(qr/column1_1/)
@@ -128,7 +134,7 @@ $t->get_ok("/mysqlviewerlite/showcreatetables?database=$database")
   ->content_like(qr/table3/);
 
 # Show select tables page
-$t->get_ok("/mysqlviewerlite/showselecttables?database=$database")
+$t->get_ok("/dbviewer/showselecttables?database=$database")
   ->content_like(qr/Select tables/)
   ->content_like(qr/table1/)
   ->content_like(qr#\Q/select?#)
@@ -136,7 +142,7 @@ $t->get_ok("/mysqlviewerlite/showselecttables?database=$database")
   ->content_like(qr/table3/);
 
 # Show Primary keys page
-$t->get_ok("/mysqlviewerlite/showprimarykeys?database=$database")
+$t->get_ok("/dbviewer/showprimarykeys?database=$database")
   ->content_like(qr/Primary keys/)
   ->content_like(qr/table1/)
   ->content_like(qr/\Q(`column1_1`)/)
@@ -145,7 +151,7 @@ $t->get_ok("/mysqlviewerlite/showprimarykeys?database=$database")
   ->content_like(qr/table3/);
 
 # Show Null allowed column page
-$t->get_ok("/mysqlviewerlite/shownullallowedcolumns?database=$database")
+$t->get_ok("/dbviewer/shownullallowedcolumns?database=$database")
   ->content_like(qr/Null allowed column/)
   ->content_like(qr/table1/)
   ->content_like(qr/\Q(`column1_2`)/)
@@ -155,7 +161,7 @@ $t->get_ok("/mysqlviewerlite/shownullallowedcolumns?database=$database")
   ->content_like(qr/table3/);
 
 # Show Database engines page
-$t->get_ok("/mysqlviewerlite/showdatabaseengines?database=$database")
+$t->get_ok("/dbviewer/showdatabaseengines?database=$database")
   ->content_like(qr/Database engines/)
   ->content_like(qr/table1/)
   ->content_like(qr/\Q(MyISAM)/)
@@ -164,7 +170,7 @@ $t->get_ok("/mysqlviewerlite/showdatabaseengines?database=$database")
   ->content_like(qr/table3/);
 
 # Show Charsets
-$t->get_ok("/mysqlviewerlite/showcharsets?database=$database")
+$t->get_ok("/dbviewer/showcharsets?database=$database")
   ->content_like(qr/Charsets/)
   ->content_like(qr/table1/)
   ->content_like(qr/\Q(ujis)/)
@@ -176,14 +182,21 @@ $t->get_ok("/mysqlviewerlite/showcharsets?database=$database")
 # Test2.pm
 my $route_test;
 {
-    package Test2;
-    use Mojolicious::Lite;
-    my $r = app->routes;
-    my $b = $r->under(sub {
-      $route_test = 1;
-      return 1;
-    });
-    plugin 'MySQLViewerLite', dbi => $dbi, route => $b, prefix => 'other';
+  package Test2;
+  use Mojolicious::Lite;
+  my $r = app->routes;
+  my $b = $r->under(sub {
+    $route_test = 1;
+    return 1;
+  });
+  plugin(
+    'DBViewer',
+    dsn => $dsn,
+    user => $user,
+    password => $password,
+    route => $b,
+    prefix => 'other'
+  );
 }
 $app = Test2->new;
 $t = Test::Mojo->new($app);
@@ -248,14 +261,25 @@ $t->get_ok("/other/showdatabaseengines?database=$database")
   ->content_like(qr/table3/);
 
 # Paging test
-$app = Test1->new;
+{
+  package Test3;
+  use Mojolicious::Lite;
+  plugin(
+    'DBViewer',
+    dsn => $dsn,
+    user => $user,
+    password => $password
+  );
+}
+
+$app = Test3->new;
 $t->app($app);
 # Paging
 eval { $dbi->execute('drop table table_page') };
 $dbi->execute('create table table_page (column_a varchar(10), column_b varchar(10))');
 $dbi->insert({column_a => 'a', column_b => 'b'}, table => 'table_page') for (1 .. 3510);
 
-$t->get_ok("/mysqlviewerlite/select?database=$database&table=table_page")
+$t->get_ok("/dbviewer/select?database=$database&table=table_page")
   ->content_like(qr#\Qselect * from <i>table_page</i>#)
   ->content_like(qr/1 to 100/)
   ->content_like(qr/3510/)
@@ -281,7 +305,7 @@ $t->get_ok("/mysqlviewerlite/select?database=$database&table=table_page")
   ->content_like(qr/20/)
   ->content_unlike(qr/21/);
 
-$t->get_ok("/mysqlviewerlite/select?database=$database&table=table_page&page=11")
+$t->get_ok("/dbviewer/select?database=$database&table=table_page&page=11")
   ->content_like(qr#\Qselect * from <i>table_page</i>#)
   ->content_like(qr/3510/)
   ->content_like(qr/1/)
@@ -306,7 +330,7 @@ $t->get_ok("/mysqlviewerlite/select?database=$database&table=table_page&page=11"
   ->content_like(qr/20/)
   ->content_unlike(qr/21/);
 
-$t->get_ok("/mysqlviewerlite/select?database=$database&table=table_page&page=12")
+$t->get_ok("/dbviewer/select?database=$database&table=table_page&page=12")
   ->content_like(qr#\Qselect * from <i>table_page</i>#)
   ->content_like(qr/3510/)
   ->content_like(qr/2/)
@@ -331,7 +355,7 @@ $t->get_ok("/mysqlviewerlite/select?database=$database&table=table_page&page=12"
   ->content_like(qr/21/)
   ->content_unlike(qr/22/);
 
-$t->get_ok("/mysqlviewerlite/select?database=$database&table=table_page&page=36")
+$t->get_ok("/dbviewer/select?database=$database&table=table_page&page=36")
   ->content_like(qr#\Qselect * from <i>table_page</i>#)
   ->content_like(qr/3501 to 3510/)
   ->content_like(qr/3510/)
@@ -360,7 +384,7 @@ $t->get_ok("/mysqlviewerlite/select?database=$database&table=table_page&page=36"
 $dbi->delete_all(table => 'table_page');
 $dbi->insert({column_a => 'a', column_b => 'b'}, table => 'table_page') for (1 .. 800);
 
-$t->get_ok("/mysqlviewerlite/select?database=$database&table=table_page")
+$t->get_ok("/dbviewer/select?database=$database&table=table_page")
   ->content_like(qr#\Qselect * from <i>table_page</i>#)
   ->content_like(qr/800/)
   ->content_like(qr/1/)
@@ -376,7 +400,7 @@ $t->get_ok("/mysqlviewerlite/select?database=$database&table=table_page")
 $dbi->delete_all(table => 'table_page');
 $dbi->insert({column_a => 'a', column_b => 'b'}, table => 'table_page') for (1 .. 801);
 
-$t->get_ok("/mysqlviewerlite/select?database=$database&table=table_page")
+$t->get_ok("/dbviewer/select?database=$database&table=table_page")
   ->content_like(qr#\Qselect * from <i>table_page</i>#)
   ->content_like(qr/801/)
   ->content_like(qr/1/)
