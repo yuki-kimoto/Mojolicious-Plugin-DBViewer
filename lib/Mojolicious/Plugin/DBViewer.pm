@@ -73,11 +73,6 @@ sub register {
   push @{$app->static->paths}, "$base_path/public";
   push @{$app->renderer->paths}, "$base_path/templates";
   
-  # Defaults
-  $app->defaults(
-    dbviewer => $self
-  );
-  
   # Routes
   my $r = $conf->{route} // $app->routes;
   $self->prefix($prefix);
@@ -98,15 +93,15 @@ sub register {
     
     # Tables
     my $utilities = [
-      {path => 'showcreatetables', title => 'Show create tables'},
-      {path => 'showselecttables', title => 'Show select tables'},
-      {path => 'showprimarykeys', title => 'Show primary keys'},
-      {path => 'shownullallowedcolumns', title => 'Show null allowed columns'},
+      {path => 'create-tables', title => 'Show create tables'},
+      {path => 'select-tables', title => 'Show select tables'},
+      {path => 'primary-keys', title => 'Show primary keys'},
+      {path => 'null-allowed-columns', title => 'Show null allowed columns'},
     ];
     if ($driver eq 'mysql') {
       push @$utilities,
-        {path => 'showdatabaseengines', title => 'Show database engines'},
-        {path => 'showcharsets', title => 'Show charsets'}
+        {path => 'database-engines', title => 'Show database engines'},
+        {path => 'charsets', title => 'Show charsets'}
     }
     $r->get('/tables')->to('#tables', utilities => $utilities);
     
@@ -114,24 +109,24 @@ sub register {
     $r->get('/table')->to('#table');
     
     # Show create tables
-    $r->get('/showcreatetables')->to('#showcreatetables');
+    $r->get('/create-tables')->to('#create_tables');
     
     # Show select tables
-    $r->get('/showselecttables')->to('#showselecttables');
+    $r->get('/select-tables')->to('#select_tables');
     
     # Show primary keys
-    $r->get('/showprimarykeys')->to('#showprimarykeys');
+    $r->get('/primary-keys')->to('#primary_keys');
     
     # Show null allowed columns
-    $r->get('/shownullallowedcolumns')->to('#shownullallowedcolumns');
+    $r->get('/null-allowed-columns')->to('#null_allowed_columns');
     
     # Select
     $r->get('/select')->to('#select');
     
     # MySQL Only
     if ($driver eq 'mysql') {
-      $r->get('/showdatabaseengines')->to('#showdatabaseengines');
-      $r->get('/showcharsets')->to('#showcharsets');
+      $r->get('/database-engines')->to('#database_engines');
+      $r->get('/charsets')->to('#charsets');
     }
   }
 }
@@ -275,5 +270,12 @@ by C<MOJOLICIOUS_PLUGIN_DBVIEWER_DEPRECATION>
 environment variable.
 
 EXPERIMENTAL features will be changed without warnings.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2013 Yuki Kimoto, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut

@@ -1,4 +1,6 @@
 <%
+  use Data::Page;
+  
   # Command
   my $command = $dbviewer->command;
 

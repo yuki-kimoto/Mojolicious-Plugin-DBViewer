@@ -123,7 +123,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table1&condition_column=co
   ->content_like(qr/\b4\b/);
 
 # Show create tables page
-$t->get_ok("/dbviewer/showcreatetables?database=$database")
+$t->get_ok("/dbviewer/create-tables?database=$database")
   ->content_like(qr/Create tables/)
   ->content_like(qr/table1/)
   ->content_like(qr/column1_1/)
@@ -134,7 +134,7 @@ $t->get_ok("/dbviewer/showcreatetables?database=$database")
   ->content_like(qr/table3/);
 
 # Show select tables page
-$t->get_ok("/dbviewer/showselecttables?database=$database")
+$t->get_ok("/dbviewer/select-tables?database=$database")
   ->content_like(qr/Select tables/)
   ->content_like(qr/table1/)
   ->content_like(qr#\Q/select?#)
@@ -142,7 +142,7 @@ $t->get_ok("/dbviewer/showselecttables?database=$database")
   ->content_like(qr/table3/);
 
 # Show Primary keys page
-$t->get_ok("/dbviewer/showprimarykeys?database=$database")
+$t->get_ok("/dbviewer/primary-keys?database=$database")
   ->content_like(qr/Primary keys/)
   ->content_like(qr/table1/)
   ->content_like(qr/\Q(`column1_1`)/)
@@ -151,7 +151,7 @@ $t->get_ok("/dbviewer/showprimarykeys?database=$database")
   ->content_like(qr/table3/);
 
 # Show Null allowed column page
-$t->get_ok("/dbviewer/shownullallowedcolumns?database=$database")
+$t->get_ok("/dbviewer/null-allowed-columns?database=$database")
   ->content_like(qr/Null allowed column/)
   ->content_like(qr/table1/)
   ->content_like(qr/\Q(`column1_2`)/)
@@ -161,7 +161,7 @@ $t->get_ok("/dbviewer/shownullallowedcolumns?database=$database")
   ->content_like(qr/table3/);
 
 # Show Database engines page
-$t->get_ok("/dbviewer/showdatabaseengines?database=$database")
+$t->get_ok("/dbviewer/database-engines?database=$database")
   ->content_like(qr/Database engines/)
   ->content_like(qr/table1/)
   ->content_like(qr/\Q(MyISAM)/)
@@ -170,7 +170,7 @@ $t->get_ok("/dbviewer/showdatabaseengines?database=$database")
   ->content_like(qr/table3/);
 
 # Show Charsets
-$t->get_ok("/dbviewer/showcharsets?database=$database")
+$t->get_ok("/dbviewer/charsets?database=$database")
   ->content_like(qr/Charsets/)
   ->content_like(qr/table1/)
   ->content_like(qr/\Q(ujis)/)
@@ -233,7 +233,7 @@ $t->get_ok("/other/select?database=$database&table=table1")
   ->content_like(qr/4/);
 
 # Show Primary keys page
-$t->get_ok("/other/showprimarykeys?database=$database")
+$t->get_ok("/other/primary-keys?database=$database")
   ->content_like(qr/Primary keys/)
   ->content_like(qr/table1/)
   ->content_like(qr/\Q(`column1_1`)/)
@@ -242,7 +242,7 @@ $t->get_ok("/other/showprimarykeys?database=$database")
   ->content_like(qr/table3/);
 
 # Show Null allowed column page
-$t->get_ok("/other/shownullallowedcolumns?database=$database")
+$t->get_ok("/other/null-allowed-columns?database=$database")
   ->content_like(qr/Null allowed column/)
   ->content_like(qr/table1/)
   ->content_like(qr/\Q(`column1_2`)/)
@@ -252,7 +252,7 @@ $t->get_ok("/other/shownullallowedcolumns?database=$database")
   ->content_like(qr/table3/);
 
 # Show Database engines page
-$t->get_ok("/other/showdatabaseengines?database=$database")
+$t->get_ok("/other/database-engines?database=$database")
   ->content_like(qr/Database engines/)
   ->content_like(qr/table1/)
   ->content_like(qr/\Q(MyISAM)/)
