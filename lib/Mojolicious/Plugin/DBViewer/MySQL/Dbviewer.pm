@@ -2,31 +2,6 @@ package Mojolicious::Plugin::DBViewer::MySQL::Dbviewer;
 use Mojo::Base 'Mojolicious::Controller';
 use Data::Page;
 
-sub shownullallowedcolumns {
-  my $self = shift;;
-  
-  my $plugin = $self->stash->{plugin};
-  my $command = $plugin->command;
-
-  # Validation
-  my $params = $command->params($self);
-  my $rule = [
-    database => {default => ''} => [
-      'safety_name'
-    ],
-  ];
-  my $vresult = $plugin->validator->validate($params, $rule);
-  my $database = $vresult->data->{database};
-  
-  # Get null allowed columns
-  my $null_allowed_columns = $command->show_null_allowed_columns($database);
-  
-  $self->render(
-    database => $database,
-    null_allowed_columns => $null_allowed_columns
-  );
-}
-
 sub select {
   my $self = shift;;
   
