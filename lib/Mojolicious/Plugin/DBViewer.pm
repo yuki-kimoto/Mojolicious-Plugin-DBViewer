@@ -2,9 +2,7 @@ use 5.008001;
 package Mojolicious::Plugin::DBViewer;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use File::Basename 'dirname';
 use Cwd 'abs_path';
-use Mojolicious::Plugin::DBViewer::Command;
 use DBIx::Custom;
 use Validator::Custom;
 use Carp 'croak';
@@ -93,16 +91,19 @@ sub register {
     
     # Tables
     my $utilities = [
-      {path => 'create-tables', title => 'Show create tables'},
-      {path => 'select-tables', title => 'Show select tables'},
-      {path => 'primary-keys', title => 'Show primary keys'},
-      {path => 'null-allowed-columns', title => 'Show null allowed columns'},
+      {path => 'create-tables', title => 'Create tables'},
+      {path => 'primary-keys', title => 'Primary keys'},
+      {path => 'null-allowed-columns', title => 'Null allowed columns'},
     ];
     if ($driver eq 'mysql') {
       push @$utilities,
-        {path => 'database-engines', title => 'Show database engines'},
-        {path => 'charsets', title => 'Show charsets'}
+        {path => 'database-engines', title => 'Database engines'},
+        {path => 'charsets', title => 'Charsets'}
     }
+    push @$utilities,
+      {path => 'select-statements', title => 'Selects statements'};
+    
+    # Tables
     $r->get('/tables')->to('#tables', utilities => $utilities);
     
     # Table
@@ -112,7 +113,7 @@ sub register {
     $r->get('/create-tables')->to('#create_tables');
     
     # Show select tables
-    $r->get('/select-tables')->to('#select_tables');
+    $r->get('/select-statements')->to('#select_statements');
     
     # Show primary keys
     $r->get('/primary-keys')->to('#primary_keys');

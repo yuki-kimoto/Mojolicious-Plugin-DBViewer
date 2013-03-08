@@ -19,8 +19,15 @@
 % layout 'dbviewer_common', title => "Primary keys in $database";
 
   % my $tables = [sort keys %$primary_keys];
-  <h2>Primary keys in <i><%= $database %></i> (<%= @$tables %>)</h2>
-  <table>
+  <ul class="nav nav-pills">
+    <li class="active">
+      <a href="<%= url_for("/dbviewer/tables?database=$database") %>">
+        <%= $database %>
+      </a>
+    </li>
+  </ul>
+  <h2>Primary keys</h2>
+  <table class="table table-bordered">
     % for (my $i = 0; $i < @$tables; $i += 3) {
       <tr>
         % for my $k (0 .. 2) {

@@ -20,8 +20,13 @@
 
 % layout 'dbviewer_common', title => "Tables in $database";
 
-  <h2>Tables in <i><%= $database %></i> (<%= @$tables %>)</h2>
-  <table>
+  <ul class="nav nav-pills">
+    <li class="active">
+      <a href="#"><%= $database %></a>
+    </li>
+  </ul>
+  <h2>Tables (<%= @$tables %>)</h2>
+  <table class="table table-bordered">
     % for (my $i = 0; $i < @$tables; $i += 3) {
       <tr>
         % for my $k (0 .. 2) {

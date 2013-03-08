@@ -18,15 +18,24 @@
       h1 {
         text-align:center;
       }
+      .container {
+        min-height:400px;
+      }
+      .footer {
+        margin-bottom:20px;
+        heigth:50px;
+      }
     % end
     
   </head>
   <body>
-    <h1><a href="<%= "/$prefix" %>"><%= $main_title %></a></h1>
-    <hr>
+    <div class="page-header">
+      <h1><a href="<%= "/$prefix" %>"><%= $main_title %></a></h1>
+    </div>
     <div class="container">
       %= content;
     </div>
-    <div class="text-center"><a href="https://github.com/yuki-kimoto/Mojolicious-Plugin-DBViewer">Mojolicious::Plugin::DBViewer</a></div>
+    <hr>
+    <div class="text-center footer"><a href="https://github.com/yuki-kimoto/Mojolicious-Plugin-DBViewer">Mojolicious::Plugin::DBViewer</a></div>
   </body>
 </html>

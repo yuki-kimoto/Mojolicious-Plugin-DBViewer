@@ -13,6 +13,7 @@ use Mojo::HelloWorld;
     my $content = $self->get_ok($url)->tx->res->body;
     while ($content =~ /<a\s+href\s*=\s*"([^"]+?)"/smg) {
       my $link = $1;
+      next if $link eq '#';
       $self->get_ok($link);
     }
   }
@@ -92,21 +93,21 @@ $t->get_ok("/dbviewer/tables?database=$database")
   ->content_like(qr/table1/)
   ->content_like(qr/table2/)
   ->content_like(qr/table3/)
-  ->content_like(qr/Show primary keys/)
-  ->content_like(qr/Show null allowed columns/)
-  ->content_like(qr/Show database engines/);
+  ->content_like(qr/Primary keys/)
+  ->content_like(qr/Null allowed columns/)
+  ->content_like(qr/Database engines/);
 $t->link_ok("/dbviewer/tables?database=$database");
 
 # Table page
 $t->get_ok("/dbviewer/table?database=$database&table=table1")
-  ->content_like(qr/show create table/)
+  ->content_like(qr/Create table/)
   ->content_like(qr/column1_1/)
   ->content_like(qr/column1_2/);
 $t->link_ok("/dbviewer/table?database=$database&table=table1");
 
 # Select page
 $t->get_ok("/dbviewer/select?database=$database&table=table1")
-  ->content_like(qr#\Qselect * from <i>table1</i>#)
+  ->content_like(qr/table1.*Select/s)
   ->content_like(qr/column1_1/)
   ->content_like(qr/column1_2/)
   ->content_like(qr/1/)
@@ -115,14 +116,14 @@ $t->get_ok("/dbviewer/select?database=$database&table=table1")
   ->content_like(qr/4/);
 
 $t->get_ok("/dbviewer/select?database=$database&table=table1&condition_column=column1_2&condition_value=4")
-  ->content_like(qr#\Qselect * from <i>table1</i>#)
+  ->content_like(qr/table1.*Select/s)
   ->content_like(qr/column1_1/)
   ->content_like(qr/column1_2/)
   ->content_unlike(qr/\b2\b/)
   ->content_like(qr/\b3\b/)
   ->content_like(qr/\b4\b/);
 
-# Show create tables page
+# Create tables page
 $t->get_ok("/dbviewer/create-tables?database=$database")
   ->content_like(qr/Create tables/)
   ->content_like(qr/table1/)
@@ -133,15 +134,15 @@ $t->get_ok("/dbviewer/create-tables?database=$database")
   ->content_like(qr/column2_2/)
   ->content_like(qr/table3/);
 
-# Show select tables page
-$t->get_ok("/dbviewer/select-tables?database=$database")
-  ->content_like(qr/Select tables/)
+# Select tables page
+$t->get_ok("/dbviewer/select-statements?database=$database")
+  ->content_like(qr/Select statements/)
   ->content_like(qr/table1/)
   ->content_like(qr#\Q/select?#)
   ->content_like(qr/table2/)
   ->content_like(qr/table3/);
 
-# Show Primary keys page
+# Primary keys page
 $t->get_ok("/dbviewer/primary-keys?database=$database")
   ->content_like(qr/Primary keys/)
   ->content_like(qr/table1/)
@@ -150,7 +151,7 @@ $t->get_ok("/dbviewer/primary-keys?database=$database")
   ->content_like(qr/table2/)
   ->content_like(qr/table3/);
 
-# Show Null allowed column page
+# Null allowed column page
 $t->get_ok("/dbviewer/null-allowed-columns?database=$database")
   ->content_like(qr/Null allowed column/)
   ->content_like(qr/table1/)
@@ -160,7 +161,7 @@ $t->get_ok("/dbviewer/null-allowed-columns?database=$database")
   ->content_unlike(qr/\Q(`column2_2`)/)
   ->content_like(qr/table3/);
 
-# Show Database engines page
+# Database engines page
 $t->get_ok("/dbviewer/database-engines?database=$database")
   ->content_like(qr/Database engines/)
   ->content_like(qr/table1/)
@@ -169,7 +170,7 @@ $t->get_ok("/dbviewer/database-engines?database=$database")
   ->content_like(qr/\Q(InnoDB)/)
   ->content_like(qr/table3/);
 
-# Show Charsets
+# Charsets
 $t->get_ok("/dbviewer/charsets?database=$database")
   ->content_like(qr/Charsets/)
   ->content_like(qr/table1/)
@@ -210,21 +211,21 @@ $t->get_ok("/other/tables?database=$database")
   ->content_like(qr/table1/)
   ->content_like(qr/table2/)
   ->content_like(qr/table3/)
-  ->content_like(qr/Show primary keys/)
-  ->content_like(qr/Show null allowed columns/)
-  ->content_like(qr/Show database engines/);
+  ->content_like(qr/Primary keys/)
+  ->content_like(qr/Null allowed columns/)
+  ->content_like(qr/Database engines/);
 $t->link_ok("/other/tables?database=$database");
 
 # Table page
 $t->get_ok("/other/table?database=$database&table=table1")
-  ->content_like(qr/show create table/)
+  ->content_like(qr/Create table/)
   ->content_like(qr/column1_1/)
   ->content_like(qr/column1_2/);
 $t->link_ok("/other/table?database=$database&table=table1");
 
 # Select page
 $t->get_ok("/other/select?database=$database&table=table1")
-  ->content_like(qr#\Qselect * from <i>table1</i>#)
+  ->content_like(qr/table1.*Select/s)
   ->content_like(qr/column1_1/)
   ->content_like(qr/column1_2/)
   ->content_like(qr/1/)
@@ -232,7 +233,7 @@ $t->get_ok("/other/select?database=$database&table=table1")
   ->content_like(qr/3/)
   ->content_like(qr/4/);
 
-# Show Primary keys page
+# Primary keys page
 $t->get_ok("/other/primary-keys?database=$database")
   ->content_like(qr/Primary keys/)
   ->content_like(qr/table1/)
@@ -241,7 +242,7 @@ $t->get_ok("/other/primary-keys?database=$database")
   ->content_like(qr/table2/)
   ->content_like(qr/table3/);
 
-# Show Null allowed column page
+# Null allowed column page
 $t->get_ok("/other/null-allowed-columns?database=$database")
   ->content_like(qr/Null allowed column/)
   ->content_like(qr/table1/)
@@ -251,7 +252,7 @@ $t->get_ok("/other/null-allowed-columns?database=$database")
   ->content_unlike(qr/\Q(`column2_2`)/)
   ->content_like(qr/table3/);
 
-# Show Database engines page
+# Database engines page
 $t->get_ok("/other/database-engines?database=$database")
   ->content_like(qr/Database engines/)
   ->content_like(qr/table1/)
@@ -280,7 +281,7 @@ $dbi->execute('create table table_page (column_a varchar(10), column_b varchar(1
 $dbi->insert({column_a => 'a', column_b => 'b'}, table => 'table_page') for (1 .. 3510);
 
 $t->get_ok("/dbviewer/select?database=$database&table=table_page")
-  ->content_like(qr#\Qselect * from <i>table_page</i>#)
+  ->content_like(qr#Select#)
   ->content_like(qr/1 to 100/)
   ->content_like(qr/3510/)
   ->content_like(qr/page=1/)
@@ -306,7 +307,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   ->content_unlike(qr/page=21/);
 
 $t->get_ok("/dbviewer/select?database=$database&table=table_page&page=11")
-  ->content_like(qr#\Qselect * from <i>table_page</i>#)
+  ->content_like(qr#Select#)
   ->content_like(qr/3510/)
   ->content_like(qr/page=1/)
   ->content_like(qr/page=2/)
@@ -331,7 +332,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page&page=11")
   ->content_unlike(qr/page=21/);
 
 $t->get_ok("/dbviewer/select?database=$database&table=table_page&page=12")
-  ->content_like(qr#\Qselect * from <i>table_page</i>#)
+  ->content_like(qr#Select#)
   ->content_like(qr/3510/)
   ->content_like(qr/page=2/)
   ->content_like(qr/page=3/)
@@ -356,7 +357,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page&page=12")
   ->content_unlike(qr/page=22/);
 
 $t->get_ok("/dbviewer/select?database=$database&table=table_page&page=36")
-  ->content_like(qr#\Qselect * from <i>table_page</i>#)
+  ->content_like(qr#Select#)
   ->content_like(qr/3501 to 3510/)
   ->content_like(qr/3510/)
   ->content_unlike(qr/page=16/)
@@ -385,7 +386,7 @@ $dbi->delete_all(table => 'table_page');
 $dbi->insert({column_a => 'a', column_b => 'b'}, table => 'table_page') for (1 .. 800);
 
 $t->get_ok("/dbviewer/select?database=$database&table=table_page")
-  ->content_like(qr#\Qselect * from <i>table_page</i>#)
+  ->content_like(qr#Select#)
   ->content_like(qr/800/)
   ->content_like(qr/page=1/)
   ->content_like(qr/page=2/)
@@ -401,7 +402,7 @@ $dbi->delete_all(table => 'table_page');
 $dbi->insert({column_a => 'a', column_b => 'b'}, table => 'table_page') for (1 .. 801);
 
 $t->get_ok("/dbviewer/select?database=$database&table=table_page")
-  ->content_like(qr#\Qselect * from <i>table_page</i>#)
+  ->content_like(qr#Select#)
   ->content_like(qr/801/)
   ->content_like(qr/page=1/)
   ->content_like(qr/page=2/)

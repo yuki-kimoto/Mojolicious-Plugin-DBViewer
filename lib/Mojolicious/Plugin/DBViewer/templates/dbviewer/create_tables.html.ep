@@ -26,8 +26,16 @@
 
 % layout 'dbviewer_common', title => "Create tables in $database ";
 
-  <h2>Create tables in <i><%= $database %></i></h2>
+  <ul class="nav nav-pills">
+    <li class="active">
+      <a href="<%= url_for("/dbviewer/tables?database=$database") %>">
+        <%= $database %>
+      </a>
+    </li>
+  </ul>
+  <h2>Create tables</h2>
   % for my $table (sort keys %$create_tables) {
+    <div class="label label-info"><%= $table %></div>
     <pre>
       <%= $create_tables->{$table} =%>
     </pre>

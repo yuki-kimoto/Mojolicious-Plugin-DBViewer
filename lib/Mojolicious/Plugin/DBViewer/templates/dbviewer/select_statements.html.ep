@@ -1,25 +1,25 @@
 <%
   # Command
   my $command = $dbviewer->command;
-  
+
   # Validation
   my $params = $command->params($self);
   my $rule = [
     database => {default => ''} => [
       'safety_name'
-    ],
+    ]
   ];
   my $vresult = $dbviewer->validator->validate($params, $rule);
   
   # Database
   my $database = $vresult->data->{database};
-  
-  # Primary keys
-  my $database_engines = $command->show_database_engines($database);
+
+  # Tables
+  my $tables = $command->show_tables($database);
 %>
 
-% layout 'dbviewer_common', title => "Database engines in $database ";
-  % my $tables = [sort keys %$database_engines];
+% layout 'dbviewer_common', title => "Show select tables in $database";
+
   <ul class="nav nav-pills">
     <li class="active">
       <a href="<%= url_for("/dbviewer/tables?database=$database") %>">
@@ -27,19 +27,15 @@
       </a>
     </li>
   </ul>
-  <h2>Database engines</h2>
+  <h2>Select statements</h2>
   <table class="table table-bordered">
     % for (my $i = 0; $i < @$tables; $i += 3) {
       <tr>
         % for my $k (0 .. 2) {
           <td>
-            % my $table = $tables->[$i + $k];
-            % if (defined $table) {
-              <a href="<%= url_for("/$prefix/table")->query(database => $database, table => $table) %>">
-                <%= $table %>
-              </a>
-              (<%= $database_engines->{$table} %>)
-            % }
+            <a href="<%= url_for("/$prefix/select")->query(database => $database, table => $tables->[$i + $k]) %>">
+              <%= $tables->[$i + $k] %>
+            </a>
           </td>
         % }
       </tr>
