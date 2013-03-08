@@ -73,6 +73,11 @@ sub register {
   push @{$app->static->paths}, "$base_path/public";
   push @{$app->renderer->paths}, "$base_path/templates";
   
+  # Defaults
+  $app->defaults(
+    dbviewer => $self
+  );
+  
   # Routes
   my $r = $conf->{route} // $app->routes;
   $self->prefix($prefix);
@@ -84,7 +89,8 @@ sub register {
       plugin => $self,
       prefix => $self->prefix,
       main_title => 'DBViewer',
-      driver => $driver
+      driver => $driver,
+      dbviewer => $self
     );
     
     # Default
