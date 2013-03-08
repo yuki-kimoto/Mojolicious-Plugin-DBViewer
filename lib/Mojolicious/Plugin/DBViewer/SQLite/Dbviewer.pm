@@ -2,31 +2,6 @@ package Mojolicious::Plugin::DBViewer::SQLite::Dbviewer;
 use Mojo::Base 'Mojolicious::Controller';
 use Data::Page;
 
-sub showprimarykeys {
-  my $self = shift;;
-  
-  my $plugin = $self->stash->{plugin};
-  my $command = $plugin->command;
-
-  # Validation
-  my $params = $command->params($self);
-  my $rule = [
-    database => {default => ''} => [
-      'safety_name'
-    ],
-  ];
-  my $vresult = $plugin->validator->validate($params, $rule);
-  my $database = $vresult->data->{database};
-  
-  # Get primary keys
-  my $primary_keys = $command->show_primary_keys($database);
-  
-  $self->render(
-    database => $database,
-    primary_keys => $primary_keys
-  );
-}
-
 sub shownullallowedcolumns {
   my $self = shift;;
   
