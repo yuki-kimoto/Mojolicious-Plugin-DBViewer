@@ -5,14 +5,6 @@ use DBIx::Custom;
 use Test::Mojo;
 use Mojo::HelloWorld;
 
-my $database = $ENV{MOJOLICIOUS_PLUGIN_MYSQLVIEWERLITE_TEST_DATABASE}
-  // 'mojomysqlviewer';
-my $dsn = "dbi:mysql:database=$database";
-my $user = $ENV{MOJOLICIOUS_PLUGIN_MYSQLVIEWERLITE_TEST_USER}
-  // 'mojomysqlviewer';
-my $password = $ENV{MOJOLICIOUS_PLUGIN_MYSQLVIEWERLITE_TEST_PASSWORD}
-  // 'mojomysqlviewer';
-
 {
   package Test::Mojo;
   sub link_ok {
@@ -27,6 +19,13 @@ my $password = $ENV{MOJOLICIOUS_PLUGIN_MYSQLVIEWERLITE_TEST_PASSWORD}
   }
 }
 
+my $database = $ENV{MOJOLICIOUS_PLUGIN_MYSQLVIEWERLITE_TEST_DATABASE}
+  // 'mojomysqlviewer';
+my $dsn = "dbi:mysql:database=$database";
+my $user = $ENV{MOJOLICIOUS_PLUGIN_MYSQLVIEWERLITE_TEST_USER}
+  // 'mojomysqlviewer';
+my $password = $ENV{MOJOLICIOUS_PLUGIN_MYSQLVIEWERLITE_TEST_PASSWORD}
+  // 'mojomysqlviewer';
 
 my $dbi;
 eval {

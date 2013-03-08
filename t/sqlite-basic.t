@@ -8,6 +8,29 @@ my $dsn = 'dbi:SQLite:dbname=:memory:';
 my $user;
 my $password;
 
+my $create_table1 = <<'EOS';
+  create table table1 (
+    column1_1 integer primary key not null,
+    column1_2
+  );
+EOS
+
+my $create_table2 = <<'EOS';
+  create table table2 (
+    column2_1 not null,
+    column2_2 not null
+  );
+EOS
+
+my $create_table3 = <<'EOS';
+  create table table3 (
+    column3_1 not null,
+    column3_2 not null
+  );
+EOS
+
+my $create_table_paging = 'create table table_page (column_a, column_b)'
+
 {
   package Test::Mojo;
   sub link_ok {
@@ -43,26 +66,9 @@ my $dbi;
   eval { $dbi->execute('drop table table2') };
   eval { $dbi->execute('drop table table3') };
 
-  $dbi->execute(<<'EOS');
-  create table table1 (
-    column1_1 integer primary key not null,
-    column1_2
-  );
-EOS
-
-  $dbi->execute(<<'EOS');
-  create table table2 (
-    column2_1 not null,
-    column2_2 not null
-  );
-EOS
-
-  $dbi->execute(<<'EOS');
-  create table table3 (
-    column3_1 not null,
-    column3_2 not null
-  );
-EOS
+  $dbi->execute($create_table1);
+  $dbi->execute($create_table2);
+  $dbi->execute($create_table3);
 
   $dbi->insert({column1_1 => 1, column1_2 => 2}, table => 'table1');
   $dbi->insert({column1_1 => 3, column1_2 => 4}, table => 'table1');
@@ -176,26 +182,9 @@ my $route_test;
   eval { $dbi->execute('drop table table2') };
   eval { $dbi->execute('drop table table3') };
 
-  $dbi->execute(<<'EOS');
-  create table table1 (
-    column1_1 integer primary key not null,
-    column1_2
-  );
-EOS
-
-  $dbi->execute(<<'EOS');
-  create table table2 (
-    column2_1 not null,
-    column2_2 not null
-  );
-EOS
-
-  $dbi->execute(<<'EOS');
-  create table table3 (
-    column3_1 not null,
-    column3_2 not null
-  );
-EOS
+  $dbi->execute($create_table1);
+  $dbi->execute($create_table2);
+  $dbi->execute($create_table3);
 
   $dbi->insert({column1_1 => 1, column1_2 => 2}, table => 'table1');
   $dbi->insert({column1_1 => 3, column1_2 => 4}, table => 'table1');
@@ -272,26 +261,10 @@ $t->get_ok("/other/null-allowed-columns?database=$database")
   eval { $dbi->execute('drop table table2') };
   eval { $dbi->execute('drop table table3') };
 
-  $dbi->execute(<<'EOS');
-  create table table1 (
-    column1_1 integer primary key not null,
-    column1_2
-  );
-EOS
+  $dbi->execute($create_table1);
+  $dbi->execute($create_table2);
+  $dbi->execute($create_table3);
 
-  $dbi->execute(<<'EOS');
-  create table table2 (
-    column2_1 not null,
-    column2_2 not null
-  );
-EOS
-
-  $dbi->execute(<<'EOS');
-  create table table3 (
-    column3_1 not null,
-    column3_2 not null
-  );
-EOS
 
   $dbi->insert({column1_1 => 1, column1_2 => 2}, table => 'table1');
   $dbi->insert({column1_1 => 3, column1_2 => 4}, table => 'table1');
@@ -302,7 +275,7 @@ $app = Test3->new;
 $t->app($app);
 
 # Paging
-$dbi->execute('create table table_page (column_a, column_b)');
+$dbi->execute($create_table_paging);
 $dbi->insert({column_a => 'a', column_b => 'b'}, table => 'table_page') for (1 .. 3510);
 
 $t->get_ok("/dbviewer/select?database=$database&table=table_page")
