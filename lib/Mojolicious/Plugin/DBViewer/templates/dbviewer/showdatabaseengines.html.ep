@@ -1,20 +1,40 @@
+<%
+  # Command
+  my $command = $dbviewer->command;
+  
+  # Validation
+  my $params = $command->params($self);
+  my $rule = [
+    database => {default => ''} => [
+      'safety_name'
+    ],
+  ];
+  my $vresult = $dbviewer->validator->validate($params, $rule);
+  
+  # Database
+  my $database = $vresult->data->{database};
+  
+  # Primary keys
+  my $database_engines = $command->show_database_engines($database);
+%>
+
 % layout 'dbviewer_common', title => "Database engines in $database ";
-% my $tables = [sort keys %$database_engines];
-<h2>Database engines in <i><%= $database %></i> (<%= @$tables %>)</h2>
-<table>
-  % for (my $i = 0; $i < @$tables; $i += 3) {
-    <tr>
-      % for my $k (0 .. 2) {
-        <td>
-          % my $table = $tables->[$i + $k];
-          % if (defined $table) {
-            <a href="<%= url_for("/$prefix/table")->query(database => $database, table => $table) %>">
-              <%= $table %>
-            </a>
-            (<%= $database_engines->{$table} %>)
-          % }
-        </td>
-      % }
-    </tr>
-  % }
-</table>
+  % my $tables = [sort keys %$database_engines];
+  <h2>Database engines in <i><%= $database %></i> (<%= @$tables %>)</h2>
+  <table>
+    % for (my $i = 0; $i < @$tables; $i += 3) {
+      <tr>
+        % for my $k (0 .. 2) {
+          <td>
+            % my $table = $tables->[$i + $k];
+            % if (defined $table) {
+              <a href="<%= url_for("/$prefix/table")->query(database => $database, table => $table) %>">
+                <%= $table %>
+              </a>
+              (<%= $database_engines->{$table} %>)
+            % }
+          </td>
+        % }
+      </tr>
+    % }
+  </table>
