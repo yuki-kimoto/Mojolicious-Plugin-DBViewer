@@ -2,35 +2,6 @@ package Mojolicious::Plugin::DBViewer::MySQL::Dbviewer;
 use Mojo::Base 'Mojolicious::Controller';
 use Data::Page;
 
-sub showcreatetables {
-  my $self = shift;;
-  
-  my $plugin = $self->stash->{plugin};
-  my $command = $plugin->command;
-
-  # Validation
-  my $params = $command->params($self);
-  my $rule = [
-    database => {default => ''} => [
-      'safety_name'
-    ]
-  ];
-  my $vresult = $plugin->validator->validate($params, $rule);
-  my $database = $vresult->data->{database};
-  my $tables = $command->show_tables($database);
-  
-  # Get create tables
-  my $create_tables = {};
-  for my $table (@$tables) {
-    $create_tables->{$table} = $plugin->command->show_create_table($database, $table);
-  }
-  
-  $self->render(
-    database => $database,
-    create_tables => $create_tables
-  );
-}
-
 sub showselecttables {
   my $self = shift;;
   

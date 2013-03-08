@@ -1,8 +1,34 @@
+<%
+  # Command
+  my $command = $dbviewer->command;
+
+  # Validation
+  my $params = $command->params($self);
+  my $rule = [
+    database => {default => ''} => [
+      'safety_name'
+    ]
+  ];
+  my $vresult = $dbviewer->validator->validate($params, $rule);
+  
+  # Database
+  my $database = $vresult->data->{database};
+  
+  # Table
+  my $tables = $command->show_tables($database);
+  
+  # Create tables
+  my $create_tables = {};
+  for my $table (@$tables) {
+    $create_tables->{$table} = $command->show_create_table($database, $table);
+  }
+%>
+
 % layout 'dbviewer_common', title => "Create tables in $database ";
-% my $tables = [sort keys %$create_tables];
-<h2>Create tables in <i><%= $database %></i></h2>
-% for my $table (@$tables) {
-  <pre>
-    <%= $create_tables->{$table} =%>
-  </pre>
-% }
+
+  <h2>Create tables in <i><%= $database %></i></h2>
+  % for my $table (sort keys %$create_tables) {
+    <pre>
+      <%= $create_tables->{$table} =%>
+    </pre>
+  % }
