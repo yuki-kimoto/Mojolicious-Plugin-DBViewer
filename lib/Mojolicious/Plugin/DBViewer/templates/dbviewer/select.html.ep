@@ -1,35 +1,103 @@
+<%
+  # Command
+  my $command = $dbviewer->command;
+
+  # Validation
+  my $params = $command->params($self);
+  my $rule = [
+    database => {default => ''} => [
+      'safety_name'
+    ],
+    table => {default => ''} => [
+      'safety_name'
+    ],
+    page => {default => 1} => [
+      'uint'
+    ],
+    condition_column => [
+      'safety_name'
+    ],
+    condition_value => [
+      'not_blank'
+    ]
+  ];
+  my $vresult = $dbviewer->validator->validate($params, $rule);
+  my $database = $vresult->data->{database};
+  my $table = $vresult->data->{table};
+  
+  # DBI
+  my $dbi = $dbviewer->dbi;
+  
+  # Where
+  my $column = $vresult->data->{condition_column};
+  my $value = $vresult->data->{condition_value};
+  
+  my $where;
+  if (defined $column && defined $value) {
+    $where = $dbi->where;
+    $where->clause(":${column}{like}");
+    $where->param({$column => $value});
+  }
+  
+  # Limit
+  my $page = $vresult->data->{page};
+  my $count = 100;
+  my $offset = ($page - 1) * $count;
+  
+  # Get null allowed columns
+  my $result = $dbi->select(
+    table => "$database.$table",
+    where => $where,
+    append => "limit $offset, $count"
+  );
+  my $header = $result->header;
+  my $rows = $result->fetch_all;
+  my $sql = $dbi->last_sql;
+  
+  # Pager
+  my $total = $dbi->select(
+    'count(*)',
+    table => "$database.$table",
+    where => $where
+  )->value;
+  my $pager = Data::Page->new($total, $count, $page);
+  
+  # Global variable for included templates
+  stash(pager => $pager);
+%>
+
 % layout 'dbviewer_common', title => "Select * from $table limit 0, 1000";
 
-<h2>select * from <i><%= $table %></i></h2>
-<form method="get" action="<%= url_for %>" >
-  <div class="condition">
-    where <%= select_field condition_column => $header %>
-      like
-      <%= input_tag 'condition_value', size => 50 %>
-      <%= submit_button 'Search' %>
-      <%= hidden_field database => param('database') %>
-      <%= hidden_field table => param('table') %>
+  <h2>select * from <i><%= $table %></i></h2>
+  <form method="get" action="<%= url_for %>" >
+    <div class="condition">
+      where <%= select_field condition_column => $header %>
+        like
+        <%= input_tag 'condition_value', size => 50 %>
+        <%= submit_button 'Search' %>
+        <%= hidden_field database => param('database') %>
+        <%= hidden_field table => param('table') %>
+    </div>
+  </form>
+  <div style="margin-left:40px; margin-bottom:15px; font-size:150%">
+    % my $first_count = ($pager->current_page - 1) * $pager->entries_per_page + 1;
+    % my $last_count = $first_count + $pager->entries_on_this_page - 1;
+    <%= $first_count %> to <%= $last_count %> (Total <i><%= $pager->total_entries %></i> count)
   </div>
-</form>
-<div style="margin-left:40px; margin-bottom:15px; font-size:150%">
-  % my $first_count = ($pager->current_page - 1) * $pager->entries_per_page + 1;
-  % my $last_count = $first_count + $pager->entries_on_this_page - 1;
-  <%= $first_count %> to <%= $last_count %> (Total <i><%= $pager->total_entries %></i> count)
-</div>
 
-<table>
-<tr>
-  % for my $h (@$header) {
-      <th><%= $h %></th>
-  % }
-</tr>
-% for my $row (@$rows) {
+  <table>
   <tr>
-    % for my $data (@$row) {
-      <td><%= $data %></td>
+    % for my $h (@$header) {
+        <th><%= $h %></th>
     % }
   </tr>
-% }
-</table>
+  % for my $row (@$rows) {
+    <tr>
+      % for my $data (@$row) {
+        <td><%= $data %></td>
+      % }
+    </tr>
+  % }
+  </table>
 
-%= include "$controller/pagenavi";
+  %= include "$controller/pagenavi";
