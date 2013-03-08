@@ -29,7 +29,7 @@ my $create_table3 = <<'EOS';
   );
 EOS
 
-my $create_table_paging = 'create table table_page (column_a, column_b)'
+my $create_table_paging = 'create table table_page (column_a, column_b)';
 
 {
   package Test::Mojo;
