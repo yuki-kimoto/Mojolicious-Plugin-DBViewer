@@ -115,4 +115,4 @@
     </tbody>
   </table>
 
-  %= include "/dbviewer/pagenavi";
+  %= include "/dbviewer/page_navi";

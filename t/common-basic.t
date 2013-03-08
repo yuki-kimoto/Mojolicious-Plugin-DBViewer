@@ -261,7 +261,7 @@ $t->get_ok("/other/null-allowed-columns?database=$database")
 
 # Paging test
 $app = Test3->new;
-$t->app($app);
+$t = Test::Mojo->new($app);
 
 # Paging
 eval { $dbi->execute("drop table table_page") };
