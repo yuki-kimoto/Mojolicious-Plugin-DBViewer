@@ -8,6 +8,7 @@
   # Validation
   my $params = $command->params($self);
   my $operators = [
+    '',
     'contains',
     'like',
     '=',
@@ -29,13 +30,16 @@
       'safety_name'
     ],
     condition_column => [
-      'safety_name'
+      'safety_name || blank'
     ],
     condition_value => [
       'not_blank'
     ],
     operator => [
       {in_array => $operators}
+    ],
+    'sort-key' => [
+      'safety_name'
     ]
   ];
   my $vresult = $dbviewer->validator->validate($params, $rule);
@@ -45,14 +49,16 @@
   # DBI
   my $dbi = $dbviewer->dbi;
   
-  # Where
+  # Paramters
+  my $data = $vresult->data;
+  my $column = $data->{condition_column};
+  my $operator = $data->{operator};
+  my $value = $data->{condition_value};
+  
   my $db_value;
   my $where;
-  if ($vresult->is_ok) {
-    my $column = $vresult->data->{condition_column};
-    my $operator = $vresult->data->{operator};
-    my $value = $vresult->data->{condition_value};
-
+  if (defined $column && $column ne '' && defined $operator && $operator ne '') {
+    # Where
     $where = $dbi->where;
     my $db_operator;
     if ($operator eq 'contains') {
@@ -78,6 +84,18 @@
     }
   }
   
+  # Order by
+  my $sort_key = $data->{'sort-key'};
+  my $order_by = '';
+  if (defined $sort_key) {
+    $order_by = "order by $sort_key";
+    
+    my $order = param('order') || '';
+    if ($order eq 'asc' || $order eq 'desc') {
+      $order_by .= " $order";
+    }
+  }
+
   # Limit
   my $page = param('page') || 1;
   my $count = 100;
@@ -87,7 +105,7 @@
   my $result = $dbi->select(
     table => "$database.$table",
     where => $where,
-    append => "limit $offset, $count"
+    append => "$order_by limit $offset, $count"
   );
   my $header = $result->header;
   my $rows = $result->fetch_all;
@@ -124,9 +142,12 @@
   <h2>Select</h2>
   <form method="get" action="<%= url_for %>" >
     <div class="label">Condition</div>
+    % my $soperators = [@$operators];
+    % splice @$soperators, 0, 1, ['---' => ''];
+    
     <div class="form-inline">
-      <%= select_field condition_column => $header, style => "width:250px" %>
-      <%= select_field operator => $operators, style => "width:130px" %>
+      <%= select_field condition_column => [['---' => ''], @$header], style => "width:250px" %>
+      <%= select_field operator => $soperators, style => "width:130px" %>
       <%= input_tag 'condition_value', style => "width:470px" %>
       <%= submit_button 'Search', class => 'btn' %>
       <%= hidden_field database => param('database') %>

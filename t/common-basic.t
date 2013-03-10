@@ -403,3 +403,4 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   ->content_like(qr/page=7/)
   ->content_like(qr/page=8/)
   ->content_like(qr/page=9/)
+
