@@ -129,31 +129,17 @@
   }
 %>
 
-% layout 'dbviewer_common', title => "Select * from $table limit 0, 1000";
+% layout 'dbviewer_common', title => "Select statement";
 
   <ul class="nav nav-pills">
     <li class="active">
       <a href="<%= url_for("/dbviewer/tables?database=$database") %>"><%= $database %></a>
     </li>
     <li class="active">
-      <a href="#"><%= $table %></a>
+      <a href="<%= url_for "/dbviewer/table?database=$database&table=$table" %>"><%= $table %></a>
     </li>
   </ul>
-  <h2>Select</h2>
-  <form method="get" action="<%= url_for %>" >
-    <div class="label">Condition</div>
-    % my $soperators = [@$operators];
-    % splice @$soperators, 0, 1, ['---' => ''];
-    
-    <div class="form-inline">
-      <%= select_field condition_column => [['---' => ''], @$header], style => "width:250px" %>
-      <%= select_field operator => $soperators, style => "width:130px" %>
-      <%= input_tag 'condition_value', style => "width:470px" %>
-      <%= submit_button 'Search', class => 'btn' %>
-      <%= hidden_field database => param('database') %>
-      <%= hidden_field table => param('table') %>
-    </div>
-  </form>
+  <h2>Select statement</h2>
   <div class="well">
     <div><b>Query</b></div>
     <div><%= $sql %></div>
@@ -161,6 +147,25 @@
       <div><b>Parameter:</b> <%= $db_value eq '' ? '(Space)' : $db_value %></div>
     % }
   </div>
+  <form method="get" action="<%= url_for %>" >
+    <div class="label">Condition</div>
+    % my $soperators = [@$operators];
+    % splice @$soperators, 0, 1, ['---' => ''];
+    <div class="form-inline">
+      <%= select_field condition_column => [['---' => ''], @$header], style => "width:250px" %>
+      <%= select_field operator => $soperators, style => "width:130px" %>
+      <%= input_tag 'condition_value', style => "width:470px" %>
+      <%= hidden_field database => param('database') %>
+      <%= hidden_field table => param('table') %>
+    </div>
+
+    <div class="label">Order</div>
+    <div class="form-inline">
+      <%= select_field 'sort-key' => [['---' => ''], @$header], style => "width:250px" %>
+      <%= select_field 'order' => [['---' => ''], 'asc', 'desc'], style => "width:130px" %>
+    </div>
+    <div><%= submit_button 'Search', class => 'btn' %></div>
+  </form>
   <div>
     % my $first_count = ($pager->current_page - 1) * $pager->entries_per_page + 1;
     % my $last_count = $first_count + $pager->entries_on_this_page - 1;
