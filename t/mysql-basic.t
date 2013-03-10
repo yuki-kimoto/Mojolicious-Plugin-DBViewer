@@ -38,6 +38,12 @@ EOS
     ) engine=InnoDB;
 EOS
 
+  our $create_table4 = <<'EOS';
+    create table table4 (
+      k1 int,
+      k2 varchar(100)
+    );
+EOS
   our $create_table_paging
     = 'create table table_page (column_a varchar(10), column_b varchar(10))';
 }
