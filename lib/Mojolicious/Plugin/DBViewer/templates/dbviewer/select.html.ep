@@ -81,21 +81,41 @@
   <h2>Select</h2>
   <form method="get" action="<%= url_for %>" >
     <div class="label">Condition</div>
-    <div class="form-inline"">
-      <%= select_field condition_column => $header %>
-      like
-      <%= input_tag 'condition_value', size => 50 %>
+    <div class="form-inline">
+      <%= select_field condition_column => $header, style => "width:250px" %>
+      <%
+        my $operations = [
+          'contains',
+          'like',
+          '=',
+          '<>',
+          '<',
+          '<=',
+          '>',,
+          '>=',
+          'is null',
+          'is not null',
+          'is space',
+          'is not space'
+        ];
+      %>
+      <%= select_field operation => $operations, style => "width:130px" %>
+      <%= input_tag 'condition_value', style => "width:470px" %>
       <%= submit_button 'Search', class => 'btn' %>
       <%= hidden_field database => param('database') %>
       <%= hidden_field table => param('table') %>
     </div>
   </form>
+  <div class="well">
+    <div><b>Query</b></div>
+    <div><%= $sql %></div>
+    <div><b>Parameter:</b> <%= $value %></div>
+  </div>
   <div>
     % my $first_count = ($pager->current_page - 1) * $pager->entries_per_page + 1;
     % my $last_count = $first_count + $pager->entries_on_this_page - 1;
     <%= $first_count %> to <%= $last_count %> (Total <i><%= $pager->total_entries %></i>)
   </div>
-
   <table class="table table-bordered">
     <thead>
       <tr class="success">
