@@ -1,11 +1,26 @@
 <%
   use Data::Page;
+  use Mojo::JSON;
   
   # Command
   my $command = $dbviewer->command;
 
   # Validation
   my $params = $command->params($self);
+  my $operators = [
+    'contains',
+    'like',
+    '=',
+    '<>',
+    '<',
+    '<=',
+    '>',,
+    '>=',
+    'is null',
+    'is not null',
+    'is space',
+    'is not space'
+  ];
   my $rule = [
     database => {default => ''} => [
       'safety_name'
@@ -13,14 +28,14 @@
     table => {default => ''} => [
       'safety_name'
     ],
-    page => {default => 1} => [
-      'uint'
-    ],
     condition_column => [
       'safety_name'
     ],
     condition_value => [
       'not_blank'
+    ],
+    operator => [
+      {in_array => $operators}
     ]
   ];
   my $vresult = $dbviewer->validator->validate($params, $rule);
@@ -31,18 +46,40 @@
   my $dbi = $dbviewer->dbi;
   
   # Where
-  my $column = $vresult->data->{condition_column};
-  my $value = $vresult->data->{condition_value};
-  
+  my $db_value;
   my $where;
-  if (defined $column && defined $value) {
+  if ($vresult->is_ok) {
+    my $column = $vresult->data->{condition_column};
+    my $operator = $vresult->data->{operator};
+    my $value = $vresult->data->{condition_value};
+
     $where = $dbi->where;
-    $where->clause(":${column}{like}");
-    $where->param({$column => $value});
+    my $db_operator;
+    if ($operator eq 'contains') {
+      $db_operator = 'like';
+      $db_value = "%$value%";
+      $where->clause(":${column}{$db_operator}");
+      $where->param({$column => $db_value});
+    }
+    elsif ($operator eq 'is null' || $operator eq 'is not null') {
+      $where->clause("$column $operator");
+    }
+    elsif ($operator eq 'is space' || $operator eq 'is not space') {
+      $db_operator = $operator eq 'is space' ? '=' : '<>';
+      $db_value = '';
+      $where->clause(":${column}{$db_operator}");
+      $where->param({$column => $db_value});
+    }
+    else {
+      $db_operator = $operator;
+      $db_value = $value;
+      $where->clause(":${column}{$db_operator}");
+      $where->param({$column => $db_value});
+    }
   }
   
   # Limit
-  my $page = $vresult->data->{page};
+  my $page = param('page') || 1;
   my $count = 100;
   my $offset = ($page - 1) * $count;
   
@@ -66,6 +103,12 @@
   
   # Global variable for included templates
   stash(pager => $pager);
+  
+  my $output = param('output') || '';
+  if ($output eq 'json') {
+    $self->render_json;
+    return Mojo::JSON->new->encode({header => $header, rows => $rows});
+  }
 %>
 
 % layout 'dbviewer_common', title => "Select * from $table limit 0, 1000";
@@ -83,23 +126,7 @@
     <div class="label">Condition</div>
     <div class="form-inline">
       <%= select_field condition_column => $header, style => "width:250px" %>
-      <%
-        my $operations = [
-          'contains',
-          'like',
-          '=',
-          '<>',
-          '<',
-          '<=',
-          '>',,
-          '>=',
-          'is null',
-          'is not null',
-          'is space',
-          'is not space'
-        ];
-      %>
-      <%= select_field operation => $operations, style => "width:130px" %>
+      <%= select_field operator => $operators, style => "width:130px" %>
       <%= input_tag 'condition_value', style => "width:470px" %>
       <%= submit_button 'Search', class => 'btn' %>
       <%= hidden_field database => param('database') %>
@@ -109,7 +136,9 @@
   <div class="well">
     <div><b>Query</b></div>
     <div><%= $sql %></div>
-    <div><b>Parameter:</b> <%= $value %></div>
+    % if (defined $db_value) {
+      <div><b>Parameter:</b> <%= $db_value eq '' ? '(Space)' : $db_value %></div>
+    % }
   </div>
   <div>
     % my $first_count = ($pager->current_page - 1) * $pager->entries_per_page + 1;
@@ -117,22 +146,22 @@
     <%= $first_count %> to <%= $last_count %> (Total <i><%= $pager->total_entries %></i>)
   </div>
   <table class="table table-bordered">
-    <thead>
-      <tr class="success">
-        % for my $h (@$header) {
-            <th><%= $h %></th>
+    <tr class="success">
+      % for (my $i = 0; $i < @$header; $i++) {
+        % my $h = $header->[$i];
+        <th class="header--<%= $h %>"><%= $h %></th>
+      % }
+    </tr>
+    % for (my $i = 0; $i < @$rows; $i++) {
+      % my $row = $rows->[$i];
+      <tr class="row--<%= $i + 1 %>">
+        % for (my $k = 0; $k < @$row; $k++) {
+          % my $data = $row->[$k];
+          % my $h = $header->[$k];
+          <td class="column--<%= $h %>"><%= $data %></td>
         % }
       </tr>
-    </thead>
-    <tbody>
-      % for my $row (@$rows) {
-        <tr>
-          % for my $data (@$row) {
-            <td><%= $data %></td>
-          % }
-        </tr>
-      % }
-    </tbody>
+    % }
   </table>
 
   %= include "/dbviewer/page_navi";
