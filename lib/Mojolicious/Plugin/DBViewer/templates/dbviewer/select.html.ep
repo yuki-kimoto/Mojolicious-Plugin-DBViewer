@@ -40,7 +40,7 @@
     ],
     'sort-key' => [
       'safety_name'
-    ]
+    ],
   ];
   my $vresult = $dbviewer->validator->validate($params, $rule);
   my $database = $vresult->data->{database};
@@ -130,7 +130,47 @@
 %>
 
 % layout 'dbviewer_common', title => "Select statement";
-
+  
+  %= javascript begin
+  
+    // Check all column checkbox or none
+    $(document).ready(function () {
+      
+      // Check all display columns
+      $('.check-all-btn').on('click', function () {
+        $('input[name="h"]').prop('checked', true);
+      });
+      
+      // Check none displya columns
+      $('.check-none-btn').on('click', function () {
+        $('input[name="h"]').prop('checked', false);
+      });
+      
+      // Initialize columns
+      var at_least_checked;
+      $('input[name="h"]').each(function () {
+        if ($(this).prop('checked')) {
+          at_least_checked = 1;
+        }
+      });
+      
+      if (at_least_checked) {
+        $('input[name="h"]').each(function () {
+          if ($(this).prop('checked')) {
+            var num = $(this).val();
+            $('.header-' + num).css('display', 'table-cell');
+            $('.column-' + num).css('display', 'table-cell');
+          }
+          else {
+            var num = $(this).val();
+            $('.header-' + num).css('display', 'none');
+            $('.column-' + num).css('display', 'none');
+          }
+        });
+      }
+    });
+  % end
+  
   <ul class="nav nav-pills">
     <li class="active">
       <a href="<%= url_for("/dbviewer/tables?database=$database") %>"><%= $database %></a>
@@ -164,7 +204,22 @@
       <%= select_field 'sort-key' => [['---' => ''], @$header], style => "width:250px" %>
       <%= select_field 'order' => [['---' => ''], 'asc', 'desc'], style => "width:130px" %>
     </div>
-    <div><%= submit_button 'Search', class => 'btn' %></div>
+    <div class="label">Columns</div>
+    <div class="form-inline">
+      <div class="check-all-btn btn btn-mini btn-info">
+        All
+      </div>
+      <div class="check-none-btn btn btn-mini btn-info">
+        None
+      </div>
+      % for (my $i = 0; $i < @$header; $i++) {
+        <label class="checkbox inline">
+          % my $h = $header->[$i];
+          <%= check_box h => $i + 1 %> <%= $h %>
+        </label>
+      % }
+    </div>
+    <div><%= submit_button 'Search', class => 'btn', style => "margin-top:5px;width:150px" %></div>
   </form>
   <div>
     % my $first_count = ($pager->current_page - 1) * $pager->entries_per_page + 1;
@@ -175,16 +230,16 @@
     <tr class="success">
       % for (my $i = 0; $i < @$header; $i++) {
         % my $h = $header->[$i];
-        <th class="header--<%= $h %>"><%= $h %></th>
+        <th class="header-<%= $h %> header-<%= $i + 1 %>"><%= $h %></th>
       % }
     </tr>
     % for (my $i = 0; $i < @$rows; $i++) {
       % my $row = $rows->[$i];
-      <tr class="row--<%= $i + 1 %>">
+      <tr class="row-<%= $i + 1 %>">
         % for (my $k = 0; $k < @$row; $k++) {
           % my $data = $row->[$k];
           % my $h = $header->[$k];
-          <td class="column--<%= $h %>"><%= $data %></td>
+          <td class="column-<%= $h %> column-<%= $k + 1 %>"><%= $data %></td>
         % }
       </tr>
     % }
