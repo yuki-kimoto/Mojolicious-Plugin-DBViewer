@@ -17,8 +17,8 @@ WriteMakefile(
         'Mojolicious'       => '2.59',
         'DBIx::Custom'      => '0.25',
         'Data::Page'        => '2.02',
-	'Validator::Custom' => '0.15',
-	'DBIx::Connector'   => '0.52'
+        'Validator::Custom' => '0.15',
+        'DBIx::Connector'   => '0.52'
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Mojolicious-Plugin-DBViewer-*' },
