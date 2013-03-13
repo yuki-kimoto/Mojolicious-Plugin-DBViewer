@@ -13,10 +13,12 @@ WriteMakefile(
       : ()),
     PL_FILES            => {},
     PREREQ_PM => {
-        'Test::More' => 0,
-        'Mojolicious' => '2.59',
-        'DBIx::Custom' => '0.25',
-        'Data::Page' => '2.02'
+        'Test::More'        => 0,
+        'Mojolicious'       => '2.59',
+        'DBIx::Custom'      => '0.25',
+        'Data::Page'        => '2.02',
+	'Validator::Custom' => '0.15',
+	'DBIx::Connector'   => '0.52'
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Mojolicious-Plugin-DBViewer-*' },
