@@ -7,7 +7,7 @@ use DBIx::Custom;
 use Validator::Custom;
 use Carp 'croak';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has 'command';
 has 'prefix';
@@ -267,7 +267,7 @@ but if at least one person use the feature and tell me that thing
 I extend one year each time he tell me it.
 
 DEPRECATION warnings can be suppressed
-by C<MOJOLICIOUS_PLUGIN_DBVIEWER_DEPRECATION>
+by C<MOJOLICIOUS_PLUGIN_DBVIEWER_SUPPRESS_DEPRECATION>
 environment variable.
 
 EXPERIMENTAL features will be changed without warnings.
