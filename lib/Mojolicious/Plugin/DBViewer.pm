@@ -141,7 +141,7 @@ sub register {
 
 =head1 NAME
 
-Mojolicious::Plugin::DBViewer - Mojolicious plugin to display MySQL database information on browser
+Mojolicious::Plugin::DBViewer - Mojolicious plugin to display database information on browser
 
 =head1 CAUTION
 
@@ -198,11 +198,12 @@ Display C<show create table>
 
 =item *
 
-Select * from TABLE
+Execute simple select statement
 
 =item *
 
-Display C<primary keys>, C<null allowed columnes>, C<database engines> and C<charsets> in all tables.
+Display C<primary keys>, C<null allowed columnes>, C<database engines>
+and C<charsets> in all tables.
 
 =back
 
