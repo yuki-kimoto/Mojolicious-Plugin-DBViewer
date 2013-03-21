@@ -33,6 +33,6 @@
   <h3>Query</h3>
   <ul>
     <li>
-      <a href="<%= url_for("/$prefix/select")->query(database => $database, table => $table) %>">Select statement</a>
+      <a href="<%= url_for("$sprefix/select")->query(database => $database, table => $table) %>">Select statement</a>
     </li>
   </ul>

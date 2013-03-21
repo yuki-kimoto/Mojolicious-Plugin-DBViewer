@@ -7,7 +7,7 @@ use DBIx::Custom;
 use Validator::Custom;
 use Carp 'croak';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has 'command';
 has 'prefix';
@@ -20,7 +20,11 @@ sub register {
   my ($self, $app, $conf) = @_;
   
   # Prefix
-  my $prefix = $conf->{prefix} // 'dbviewer';
+  my $prefix = $conf->{prefix};
+  $prefix = 'dbviewer' unless defined $prefix;
+  
+  # Slash and prefix
+  my $sprefix = $prefix eq '' ? $prefix : "/$prefix";
   
   # DBI
   my $dbi = DBIx::Custom->connect(
@@ -72,7 +76,8 @@ sub register {
   push @{$app->renderer->paths}, "$base_path/templates";
   
   # Routes
-  my $r = $conf->{route} // $app->routes;
+  my $r = $conf->{route};
+  $r = $app->routes unless defined $r;
   $self->prefix($prefix);
   {
     # Config
@@ -80,7 +85,7 @@ sub register {
       'dbviewer#',
       namespace => $namespace,
       plugin => $self,
-      prefix => $self->prefix,
+      sprefix => $sprefix,
       main_title => 'DBViewer',
       driver => $driver,
       dbviewer => $self

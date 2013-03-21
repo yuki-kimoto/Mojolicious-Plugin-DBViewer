@@ -558,3 +558,86 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
     ;
 
 }
+
+# Empty prefix
+{
+  my $route_test;
+  {
+    package Test4;
+    use Mojolicious::Lite;
+    my $connector;
+    plugin(
+      'DBViewer',
+      prefix => '',
+      dsn => $dsn,
+      user => $user,
+      password => $password,
+      connector_get => \$connector
+    );
+
+    $dbi = DBIx::Custom->connect(connector => $connector);
+
+    # Prepare database
+    eval { $dbi->execute('drop table table1') };
+    eval { $dbi->execute('drop table table2') };
+    eval { $dbi->execute('drop table table3') };
+
+    $dbi->execute($create_table1);
+    $dbi->execute($create_table2);
+    $dbi->execute($create_table3);
+
+    $dbi->insert({column1_1 => 1, column1_2 => 2}, table => 'table1');
+    $dbi->insert({column1_1 => 3, column1_2 => 4}, table => 'table1');
+  }
+
+  $app = Test4->new;
+  $t = Test::Mojo->new($app);
+
+  # Top page
+  $t->get_ok('/')->content_like(qr/$database\s+\(current\)/);
+
+  # Tables page
+  $t->get_ok("/tables?database=$database")
+    ->content_like(qr/table1/)
+    ->content_like(qr/table2/)
+    ->content_like(qr/table3/)
+    ->content_like(qr/Primary keys/)
+    ->content_like(qr/Null allowed columns/);
+  $t->link_ok("/tables?database=$database");
+
+  # Table page
+  $t->get_ok("/table?database=$database&table=table1")
+    ->content_like(qr/Create table/)
+    ->content_like(qr/column1_1/)
+    ->content_like(qr/column1_2/);
+  $t->link_ok("/table?database=$database&table=table1");
+
+  # Select page
+  $t->get_ok("/select?database=$database&table=table1")
+    ->content_like(qr/Select.*table1/s)
+    ->content_like(qr/column1_1/)
+    ->content_like(qr/column1_2/)
+    ->content_like(qr/1/)
+    ->content_like(qr/2/)
+    ->content_like(qr/3/)
+    ->content_like(qr/4/);
+
+  # Primary keys page
+  $t->get_ok("/primary-keys?database=$database")
+    ->content_like(qr/Primary keys/)
+    ->content_like(qr/table1/)
+    ->content_like(qr/column1_1/)
+    ->content_unlike(qr/column1_2/)
+    ->content_like(qr/table2/)
+    ->content_like(qr/table3/);
+
+  # Null allowed column page
+  $t->get_ok("/null-allowed-columns?database=$database")
+    ->content_like(qr/Null allowed column/)
+    ->content_like(qr/table1/)
+    ->content_like(qr/column1_2/)
+    ->content_like(qr/table2/)
+    ->content_unlike(qr/column2_1/)
+    ->content_unlike(qr/column2_2/)
+    ->content_like(qr/table3/);
+}

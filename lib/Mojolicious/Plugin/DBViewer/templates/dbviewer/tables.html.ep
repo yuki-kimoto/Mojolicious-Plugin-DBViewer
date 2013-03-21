@@ -28,7 +28,7 @@
       <tr>
         % for my $k (0 .. 2) {
           <td>
-            <a href="<%= url_for("/$prefix/table")->query(database => $database, table => $tables->[$i + $k]) %>">
+            <a href="<%= url_for("$sprefix/table")->query(database => $database, table => $tables->[$i + $k]) %>">
               <%= $tables->[$i + $k] %>
             </a>
           </td>
@@ -43,7 +43,7 @@
       % my $path = $utility->{path};
       % my $title = $utility->{title};
       <li>
-        <a href="<%= url_for("/$prefix/$path")->query(database => $database) %>">
+        <a href="<%= url_for("$sprefix/$path")->query(database => $database) %>">
           <i class="icon-circle-arrow-right"></i>
           <%= $title %>
         </a>

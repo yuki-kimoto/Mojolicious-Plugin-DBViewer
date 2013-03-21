@@ -31,7 +31,7 @@
           <td>
             % my $table = $tables->[$i + $k];
             % if (defined $table) {
-              <a href="<%= url_for("/$prefix/table")->query(database => $database, table => $table) %>">
+              <a href="<%= url_for("$sprefix/table")->query(database => $database, table => $table) %>">
                 <%= $table %>
               </a>
               <b>(<%= $database_engines->{$table} %>)</b>

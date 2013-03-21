@@ -29,7 +29,7 @@
       <tr>
         % for my $k (0 .. 2) {
           <td>
-            <a href="<%= url_for("/$prefix/select")->query(database => $database, table => $tables->[$i + $k]) %>">
+            <a href="<%= url_for("$sprefix/select")->query(database => $database, table => $tables->[$i + $k]) %>">
               <%= $tables->[$i + $k] %>
             </a>
           </td>

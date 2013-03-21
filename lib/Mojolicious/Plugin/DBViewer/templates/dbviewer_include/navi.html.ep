@@ -7,20 +7,20 @@
 
 <ul class="breadcrumb">
   <li>
-    <a href="<%= url_for("/$prefix") %>">
+    <a href="<%= url_for($sprefix) %>">
       <i class="icon-home"></i>
     </a>
     <span class="divider">/</span>
   </li>
   <li>
-    <a href="<%= url_for("/$prefix/tables?database=$database") %>">
+    <a href="<%= url_for("$sprefix/tables?database=$database") %>">
       <%= $database %>
     </a>
   </li>
   % if ($table ne '') {
     <li>
       <span class="divider">/</span>
-      <a href="<%= url_for "/$prefix/table?database=$database&table=$table" %>">
+      <a href="<%= url_for "$sprefix/table?database=$database&table=$table" %>">
         <%= $table %>
       </a>
     </li>

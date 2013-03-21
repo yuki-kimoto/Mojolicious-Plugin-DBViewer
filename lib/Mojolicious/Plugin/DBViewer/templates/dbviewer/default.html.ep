@@ -13,7 +13,7 @@
   <ul class="nav nav-list">
     % for my $database (sort @$databases) {
       <li>
-        <a href="<%= url_for("/$prefix/tables")->query(database => $database) %>">
+        <a href="<%= url_for("$sprefix/tables")->query(database => $database) %>">
           <i class="icon-circle-arrow-right"></i> <%= $database %>
           %= $current_database eq $database ? '(current)' : ''
         </a>
