@@ -20,14 +20,10 @@
 
 % layout 'dbviewer_common', title => "Show select tables in $database";
 
-  <ul class="nav nav-pills">
-    <li class="active">
-      <a href="<%= url_for("/dbviewer/tables?database=$database") %>">
-        <%= $database %>
-      </a>
-    </li>
-  </ul>
-  <h2>Select statements</h2>
+  %= include '/dbviewer_include/navi';
+
+
+  <h3>Select statements</h3>
   <table class="table table-bordered">
     % for (my $i = 0; $i < @$tables; $i += 3) {
       <tr>

@@ -8,7 +8,7 @@
 %>
 
 % layout 'dbviewer_common';
-  <h2>Databases</h2>
+  <h3>Databases</h3>
 
   <ul class="nav nav-list">
     % for my $database (sort @$databases) {

@@ -54,6 +54,7 @@ my $create_table_paging
     while ($content =~ /<a\s+href\s*=\s*"([^"]+?)"/smg) {
       my $link = $1;
       next if $link eq '#';
+      next if $link =~ /^http/;
       $self->get_ok($link);
     }
   }

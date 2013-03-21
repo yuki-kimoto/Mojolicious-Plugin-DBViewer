@@ -20,12 +20,9 @@
 
 % layout 'dbviewer_common', title => "Tables in $database";
 
-  <ul class="nav nav-pills">
-    <li class="active">
-      <a href="#"><%= $database %></a>
-    </li>
-  </ul>
-  <h2>Tables (<%= @$tables %>)</h2>
+  %= include '/dbviewer_include/navi';
+
+  <h3>Tables (<%= @$tables %>)</h3>
   <table class="table table-bordered">
     % for (my $i = 0; $i < @$tables; $i += 3) {
       <tr>
@@ -40,7 +37,7 @@
     % }
   </table>
 
-  <h2>Utilities</h2>
+  <h3>Utilities</h3>
   <ul class="nav nav-list">
     % for my $utility (@$utilities) {
       % my $path = $utility->{path};

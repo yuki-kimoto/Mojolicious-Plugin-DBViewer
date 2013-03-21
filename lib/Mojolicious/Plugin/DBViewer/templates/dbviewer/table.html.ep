@@ -23,15 +23,10 @@
   my $table_def = $command->show_create_table($database, $table);
 %>
 
-% layout 'dbviewer_common', title => "$table in $database";
-  <ul class="nav nav-pills">
-    <li class="active">
-      <a href="<%= url_for("/dbviewer/tables?database=$database") %>"><%= $database %></a>
-    </li>
-    <li class="active">
-      <a href="<%= url_for "/dbviewer/table?database=$database&table=$table" %>"><%= $table %></a>
-    </li>
-  </ul>
+% layout 'dbviewer_common';
+
+  %= include '/dbviewer_include/navi';
+
   <h3>Create table</h3>
   <pre><%= $table_def %></pre>
 

@@ -19,14 +19,10 @@
 % layout 'dbviewer_common', title => "Null allowed columns in $database";
 
   % my $tables = [sort keys %$null_allowed_columns];
-  <ul class="nav nav-pills">
-    <li class="active">
-      <a href="<%= url_for("/dbviewer/tables?database=$database") %>">
-        <%= $database %>
-      </a>
-    </li>
-  </ul>
-  <h2>Null allowed columns</h2>
+  %= include '/dbviewer_include/navi';
+
+
+  <h3>Null allowed columns</h3>
   <table class="table table-bordered">
     % for (my $i = 0; $i < @$tables; $i += 3) {
       <tr>
@@ -37,7 +33,7 @@
               <a href="<%= url_for("/$prefix/table")->query(database => $database, table => $table) %>">
                 <%= $table %>
               </a>
-              (<%= join(', ', @{$null_allowed_columns->{$table} || []}) %>)
+              <b>(<%= join(', ', @{$null_allowed_columns->{$table} || []}) %>)</b>
             % }
           </td>
         % }

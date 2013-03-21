@@ -20,14 +20,10 @@
 
 % layout 'dbviewer_common', title => "Charsets in $database ";
   % my $tables = [sort keys %$charsets];
-  <ul class="nav nav-pills">
-    <li class="active">
-      <a href="<%= url_for("/dbviewer/tables?database=$database") %>">
-        <%= $database %>
-      </a>
-    </li>
-  </ul>
-  <h2>Charsets</h2>
+  %= include '/dbviewer_include/navi';
+
+
+  <h3>Charsets</h3>
   <table class="table table-bordered">
     % for (my $i = 0; $i < @$tables; $i += 3) {
       <tr>
@@ -38,7 +34,7 @@
               <a href="<%= url_for("/$prefix/table")->query(database => $database, table => $table) %>">
                 <%= $table %>
               </a>
-              (<%= $charsets->{$table} %>)
+              <b>(<%= $charsets->{$table} %>)</b>
             % }
           </td>
         % }
