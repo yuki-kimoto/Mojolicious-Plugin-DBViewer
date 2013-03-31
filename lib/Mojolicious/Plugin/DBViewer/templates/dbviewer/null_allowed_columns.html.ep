@@ -19,7 +19,7 @@
 % layout 'dbviewer_common', title => "Null allowed columns in $database";
 
   % my $tables = [sort keys %$null_allowed_columns];
-  %= include '/dbviewer_include/navi';
+  %= include '/dbviewer/navi';
 
 
   <h3>Null allowed columns</h3>

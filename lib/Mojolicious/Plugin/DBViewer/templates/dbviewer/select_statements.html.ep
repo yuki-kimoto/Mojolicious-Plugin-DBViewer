@@ -20,7 +20,7 @@
 
 % layout 'dbviewer_common', title => "Show select tables in $database";
 
-  %= include '/dbviewer_include/navi';
+  %= include '/dbviewer/navi';
 
 
   <h3>Select statements</h3>

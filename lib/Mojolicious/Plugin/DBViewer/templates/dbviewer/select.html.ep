@@ -171,7 +171,7 @@
     });
   % end
   
-  %= include '/dbviewer_include/navi';
+  %= include '/dbviewer/navi';
   
   <h3>Select statement</h3>
   

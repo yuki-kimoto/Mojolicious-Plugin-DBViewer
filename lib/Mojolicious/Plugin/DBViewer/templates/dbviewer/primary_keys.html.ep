@@ -19,7 +19,7 @@
 % layout 'dbviewer_common', title => "Primary keys in $database";
 
   % my $tables = [sort keys %$primary_keys];
-  %= include '/dbviewer_include/navi';
+  %= include '/dbviewer/navi';
 
 
   <h3>Primary keys</h3>

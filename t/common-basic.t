@@ -209,7 +209,7 @@ $t->link_ok("/other/table?database=$database&table=table1");
 
 # Select page
 $t->get_ok("/other/select?database=$database&table=table1")
-  ->content_like(qr/Select.*table1/s)
+  ->content_like(qr/table1.*Select/s)
   ->content_like(qr/column1_1/)
   ->content_like(qr/column1_2/)
   ->content_like(qr/1/)

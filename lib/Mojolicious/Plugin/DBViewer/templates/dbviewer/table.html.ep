@@ -25,7 +25,7 @@
 
 % layout 'dbviewer_common';
 
-  %= include '/dbviewer_include/navi';
+  %= include '/dbviewer/navi';
 
   <h3>Create table</h3>
   <pre><%= $table_def %></pre>

@@ -26,7 +26,7 @@
 
 % layout 'dbviewer_common', title => "Create tables in $database ";
 
-  %= include '/dbviewer_include/navi';
+  %= include '/dbviewer/navi';
 
   <h3>Create tables</h3>
   % for my $table (sort keys %$create_tables) {
