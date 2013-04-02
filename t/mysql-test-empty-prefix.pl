@@ -9,7 +9,8 @@ plugin(
   prefix => '',
   dsn => 'dbi:mysql:database=dbix_custom',
   user => 'dbix_custom',
-  password => 'dbix_custom'
+  password => 'dbix_custom',
+  site_title => 'Web DB Viewer'
 );
 
 app->start;

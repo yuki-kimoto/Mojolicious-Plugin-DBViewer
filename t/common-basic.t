@@ -572,7 +572,8 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
       dsn => $dsn,
       user => $user,
       password => $password,
-      connector_get => \$connector
+      connector_get => \$connector,
+      site_title => 'Web DB Viewer'
     );
 
     $dbi = DBIx::Custom->connect(connector => $connector);
@@ -595,7 +596,10 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
 
   # Top page
   $t->get_ok('/')->content_like(qr/$database\s+\(current\)/);
-
+  
+  # Site title
+  $t->get_ok('/')->content_like(qr/Web DB Viewer/);
+  
   # Tables page
   $t->get_ok("/tables?database=$database")
     ->content_like(qr/table1/)
