@@ -1,6 +1,8 @@
 <%
   use Data::Page;
   use Mojo::JSON;
+  use Encode ();
+  
   
   # Command
   my $command = $dbviewer->command;
@@ -100,6 +102,8 @@
   my $page = param('page') || 1;
   my $count = 100;
   my $offset = ($page - 1) * $count;
+  
+  my $default_charset = stash('default_charset');
   
   # Get null allowed columns
   my $result = $dbi->select(
@@ -240,7 +244,7 @@
       % my $row = $rows->[$i];
       <tr class="row-<%= $i + 1 %>">
         % for (my $k = 0; $k < @$row; $k++) {
-          % my $data = $row->[$k];
+          % my $data = Encode::decode($default_charset, $row->[$k]);
           % my $h = $header->[$k];
           <td class="column-<%= $h %> column-<%= $k + 1 %>"><%= $data %></td>
         % }

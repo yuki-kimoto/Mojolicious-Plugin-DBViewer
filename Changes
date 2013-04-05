@@ -1,3 +1,5 @@
+0.11 (alpha release)
+  - added default_charset option to support character set
 0.10 (alpha release)
   - fixed home link
 0.09 (alpha release)
