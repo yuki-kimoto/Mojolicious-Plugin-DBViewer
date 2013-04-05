@@ -20,7 +20,7 @@ sub register {
   my ($self, $app, $conf) = @_;
   
   # Prefix
-  my $prefix = $conf->{prefix} // 'dbviewer';
+  my $prefix = $conf->{prefix};
   
   # DBI
   my $dbi = DBIx::Custom->connect(
@@ -72,65 +72,72 @@ sub register {
   push @{$app->renderer->paths}, "$base_path/templates";
   
   # Routes
-  my $r = $conf->{route} // $app->routes;
-  $self->prefix($prefix);
-  {
-    # Config
-    my $r = $r->route("/$prefix")->to(
-      'dbviewer#',
-      namespace => $namespace,
-      plugin => $self,
-      prefix => $self->prefix,
-      main_title => 'DBViewer',
-      driver => $driver,
-      dbviewer => $self
-    );
-    
-    # Default
-    $r->get('/')->to('#default');
-    
-    # Tables
-    my $utilities = [
-      {path => 'create-tables', title => 'Create tables'},
-      {path => 'primary-keys', title => 'Primary keys'},
-      {path => 'null-allowed-columns', title => 'Null allowed columns'},
-    ];
-    if ($driver eq 'mysql') {
+  $app->routes->add_shortcut(
+    dbviewer => sub {
+      my $r = shift;
+
+      # Config
+      $r = $r->to(
+	controller => 'dbviewer',
+	namespace => $namespace,
+	plugin => $self,
+	prefix => $self->prefix,
+	main_title => 'DBViewer',
+	driver => $driver,
+	dbviewer => $self
+      );
+
+      # Default
+      $r->get('/')->to('#default');
+
+      # Tables
+      my $utilities = [
+	{path => 'create-tables', title => 'Create tables'},
+	{path => 'primary-keys', title => 'Primary keys'},
+	{path => 'null-allowed-columns', title => 'Null allowed columns'},
+      ];
+      if ($driver eq 'mysql') {
+	push @$utilities,
+	  {path => 'database-engines', title => 'Database engines'},
+	  {path => 'charsets', title => 'Charsets'}
+      }
       push @$utilities,
-        {path => 'database-engines', title => 'Database engines'},
-        {path => 'charsets', title => 'Charsets'}
+	{path => 'select-statements', title => 'Selects statements'};
+
+      # Tables
+      $r->get('/tables')->to('#tables', utilities => $utilities);
+
+      # Table
+      $r->get('/table')->to('#table');
+
+      # Show create tables
+      $r->get('/create-tables')->to('#create_tables');
+
+      # Show select tables
+      $r->get('/select-statements')->to('#select_statements');
+
+      # Show primary keys
+      $r->get('/primary-keys')->to('#primary_keys');
+
+      # Show null allowed columns
+      $r->get('/null-allowed-columns')->to('#null_allowed_columns');
+
+      # Select
+      $r->get('/select')->to('#select');
+
+      # MySQL Only
+      if ($driver eq 'mysql') {
+	$r->get('/database-engines')->to('#database_engines');
+	$r->get('/charsets')->to('#charsets');
+      }
     }
-    push @$utilities,
-      {path => 'select-statements', title => 'Selects statements'};
-    
-    # Tables
-    $r->get('/tables')->to('#tables', utilities => $utilities);
-    
-    # Table
-    $r->get('/table')->to('#table');
-    
-    # Show create tables
-    $r->get('/create-tables')->to('#create_tables');
-    
-    # Show select tables
-    $r->get('/select-statements')->to('#select_statements');
-    
-    # Show primary keys
-    $r->get('/primary-keys')->to('#primary_keys');
-    
-    # Show null allowed columns
-    $r->get('/null-allowed-columns')->to('#null_allowed_columns');
-    
-    # Select
-    $r->get('/select')->to('#select');
-    
-    # MySQL Only
-    if ($driver eq 'mysql') {
-      $r->get('/database-engines')->to('#database_engines');
-      $r->get('/charsets')->to('#charsets');
-    }
-  }
-}
+  );
+
+  if ($prefix) {
+    $self->prefix($prefix);
+    $app->routes->route("/$prefix")->dbviewer;
+  };
+};
 
 1;
 
