@@ -10,7 +10,6 @@ use Encode qw/encode decode/;
 {
   my $dsn = 'dbi:SQLite:dbname=:memory:';
 
-  # Test1.pm
   my $connector;
   {
     package Test1;
@@ -33,7 +32,6 @@ use Encode qw/encode decode/;
 {
   my $dsn = 'dbi:SQLite:dbname=:memory:';
 
-  # Test1.pm
   my $connector;
   {
     package Test2;
@@ -55,4 +53,28 @@ use Encode qw/encode decode/;
 
   $t->get_ok("/dbviewer/select?database=main&table=t1&condition_value=あ")
     ->content_like(qr/あ/);
+}
+
+# footer_text and footer_link option
+{
+  my $dsn = 'dbi:SQLite:dbname=:memory:';
+
+  my $connector;
+  {
+    package Test3;
+    use Mojolicious::Lite;
+    plugin(
+      'DBViewer',
+      dsn => $dsn,
+      footer_text => 'Web DB Viewer',
+      footer_link => 'http://some.com'
+    );
+  }
+  
+  my $app = Test3->new;
+  my $t = Test::Mojo->new($app);
+
+  $t->get_ok("/dbviewer")
+    ->content_like(qr/Web DB Viewer/)
+    ->content_like(qr#\Qhttp://some.com#);
 }
