@@ -56,7 +56,9 @@
   my $column = $data->{condition_column};
   my $operator = $data->{operator};
   my $value = $data->{condition_value};
+
   
+  my $default_charset = stash('default_charset');
   my $db_value;
   my $where;
   if (defined $column && $column ne '' && defined $operator && $operator ne '') {
@@ -67,7 +69,6 @@
       $db_operator = 'like';
       $db_value = "%$value%";
       $where->clause(":${column}{$db_operator}");
-      $where->param({$column => $db_value});
     }
     elsif ($operator eq 'is null' || $operator eq 'is not null') {
       $where->clause("$column $operator");
@@ -76,12 +77,14 @@
       $db_operator = $operator eq 'is space' ? '=' : '<>';
       $db_value = '';
       $where->clause(":${column}{$db_operator}");
-      $where->param({$column => $db_value});
     }
     else {
       $db_operator = $operator;
       $db_value = $value;
       $where->clause(":${column}{$db_operator}");
+    }
+    if (defined $db_value) {
+      $db_value = Encode::encode($default_charset, $db_value) if defined $db_value;
       $where->param({$column => $db_value});
     }
   }
@@ -102,8 +105,6 @@
   my $page = param('page') || 1;
   my $count = 100;
   my $offset = ($page - 1) * $count;
-  
-  my $default_charset = stash('default_charset');
   
   # Get null allowed columns
   my $result = $dbi->select(

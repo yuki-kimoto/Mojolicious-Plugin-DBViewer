@@ -25,7 +25,7 @@ use Encode qw/encode decode/;
   my $app = Test1->new;
   my $t = Test::Mojo->new($app);
 
-  $t->get_ok("/dbviewer/select?database=main&table=t1")
+  $t->get_ok("/dbviewer/select?database=main&table=t1&condition_value=あ")
     ->content_like(qr/あ/);
 }
 
@@ -53,6 +53,6 @@ use Encode qw/encode decode/;
   my $app = Test2->new;
   my $t = Test::Mojo->new($app);
 
-  $t->get_ok("/dbviewer/select?database=main&table=t1")
+  $t->get_ok("/dbviewer/select?database=main&table=t1&condition_value=あ")
     ->content_like(qr/あ/);
 }
