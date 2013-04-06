@@ -7,7 +7,7 @@ use DBIx::Custom;
 use Validator::Custom;
 use Carp 'croak';
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 has 'command';
 has 'prefix';
@@ -120,7 +120,7 @@ sub register {
     );
     
     # Auto Route
-    plugin 'AutoRoute', route => $r, top_dir => 'dbviewer/auto';
+    $app->plugin('AutoRoute', route => $r, top_dir => 'dbviewer/auto');
   }
 }
 
