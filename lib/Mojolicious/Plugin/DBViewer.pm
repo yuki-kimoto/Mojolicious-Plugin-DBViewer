@@ -181,11 +181,11 @@ B<This module is alpha release. features will be changed without warnings.>
   http://localhost:3000/dbviewer
   
   # Prefix change (http://localhost:3000/dbviewer2)
-  plugin 'DBViewer', dbh => $dbh, prefix => 'dbviewer2';
+  plugin 'DBViewer', dsn => $dsn, prefix => 'dbviewer2';
 
   # Route
   my $bridge = $app->route->under(sub {...});
-  plugin 'DBViewer', route => $bridge, ...;
+  plugin 'DBViewer', dsn => $dsn, route => $bridge;
 
 =head1 DESCRIPTION
 
@@ -287,7 +287,7 @@ Router, default to C<$app->routes>.
 It is useful when C<under> is used.
 
   my $bridge = $r->under(sub {...});
-  plugin 'DBViewer', dbh => $dbh, route => $bridge;
+  plugin 'DBViewer', dsn => $dsn, route => $bridge;
 
 =head2 user
 

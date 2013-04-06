@@ -35,8 +35,8 @@ Example
   http://localhost:3000/dbviewer
   
   # Prefix change (http://localhost:3000/dbviewer2)
-  plugin 'DBViewer', dbh => $dbh, prefix => 'dbviewer2';
+  plugin 'DBViewer', dsn => $dsn, prefix => 'dbviewer2';
 
   # Route
   my $bridge = $app->route->under(sub {...});
-  plugin 'DBViewer', route => $bridge, ...;
+  plugin 'DBViewer', dsn => $dsn, route => $bridge;
