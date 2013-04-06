@@ -89,24 +89,8 @@ sub register {
     my $footer_link = $conf->{footer_link}
       || 'http://search.cpan.org/dist/Mojolicious-Plugin-DBViewer'
        . '/lib/Mojolicious/Plugin/DBViewer.pm';
-    
-    my $r = $r->route("/$prefix")->to(
-      'dbviewer#',
-      namespace => $namespace,
-      plugin => $self,
-      sprefix => $sprefix,
-      site_title => $site_title,
-      driver => $driver,
-      dbviewer => $self,
-      default_charset => $default_charset,
-      footer_text => $footer_text,
-      footer_link => $footer_link
-    );
-    
-    # Default
-    $r->get('/')->to('#default');
-    
-    # Tables
+
+    # Utilities
     my $utilities = [
       {path => 'create-tables', title => 'Create tables'},
       {path => 'primary-keys', title => 'Primary keys'},
@@ -120,32 +104,23 @@ sub register {
     push @$utilities,
       {path => 'select-statements', title => 'Selects statements'};
     
-    # Tables
-    $r->get('/tables')->to('#tables', utilities => $utilities);
+    # Route Config
+    my $r = $r->route("/$prefix")->to(
+      'dbviewer#',
+      namespace => $namespace,
+      plugin => $self,
+      sprefix => $sprefix,
+      site_title => $site_title,
+      driver => $driver,
+      dbviewer => $self,
+      default_charset => $default_charset,
+      footer_text => $footer_text,
+      footer_link => $footer_link,
+      utilities => $utilities
+    );
     
-    # Table
-    $r->get('/table')->to('#table');
-    
-    # Show create tables
-    $r->get('/create-tables')->to('#create_tables');
-    
-    # Show select tables
-    $r->get('/select-statements')->to('#select_statements');
-    
-    # Show primary keys
-    $r->get('/primary-keys')->to('#primary_keys');
-    
-    # Show null allowed columns
-    $r->get('/null-allowed-columns')->to('#null_allowed_columns');
-    
-    # Select
-    $r->get('/select')->to('#select');
-    
-    # MySQL Only
-    if ($driver eq 'mysql') {
-      $r->get('/database-engines')->to('#database_engines');
-      $r->get('/charsets')->to('#charsets');
-    }
+    # Auto Route
+    plugin 'AutoRoute', route => $r, top_dir => 'dbviewer/auto';
   }
 }
 
