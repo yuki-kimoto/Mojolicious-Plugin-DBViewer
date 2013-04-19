@@ -40,7 +40,7 @@ use Encode qw/encode decode/;
       'DBViewer',
       dsn => $dsn,
       connector_get => \$connector,
-      default_charset => 'euc-jp'
+      charset => 'euc-jp'
     );
   }
   

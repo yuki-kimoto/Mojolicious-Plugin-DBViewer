@@ -1,3 +1,11 @@
+0.16
+  - renamed default_charset to charset.
+  - Released!
+0.15 (beta release)
+  - upgrade Mojolicious::Plugin::AutoRoute 0.08
+    which has bug that two different auto route don't work.
+0.14 (beta release)
+  - internal change only(upgrade Mojolicious::Plugin::AutoRoute 0.07)
 0.13 (alpha release)
   - cleanup internal
 0.12 (alpha release)

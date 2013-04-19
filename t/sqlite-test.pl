@@ -11,7 +11,7 @@ plugin(
   'DBViewer',
   dsn => 'dbi:SQLite:dbname=:memory:',
   connector_get => \$connector,
-  default_charset => 'euc-jp'
+  charset => 'euc-jp'
 );
 
 my $dbi = DBIx::Custom->connect(connector => $connector);
