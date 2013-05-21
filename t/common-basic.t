@@ -99,7 +99,10 @@ $t->get_ok("/dbviewer/select?database=$database&table=table1&output=json")
   ->content_like(qr/1/)
   ->content_like(qr/2/)
   ->content_like(qr/3/)
-  ->content_like(qr/4/);
+  ->content_like(qr/4/)
+;
+
+__END__
 
 # Select page(JSON)
 $t->get_ok("/dbviewer/select?database=$database&table=table1&condition_column=column1_2&condition_value=4&operator=like&output=json")
@@ -428,7 +431,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
       [121, 1]
     ])
     ;
-  
+
   # like
   $model->delete_all;
   $model->insert({k1 => 2, k2 => 1});
