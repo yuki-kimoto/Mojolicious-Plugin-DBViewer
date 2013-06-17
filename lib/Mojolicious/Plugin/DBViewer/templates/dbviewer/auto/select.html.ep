@@ -9,7 +9,7 @@
 
   # Validation
   my $params = $command->params($self);
-  my $operators = [
+  my $ops = [
     '',
     'contains',
     'like',
@@ -32,14 +32,14 @@
     table => {default => ''} => [
       'safety_name'
     ],
-    condition_column => [
+    c1 => [
       'safety_name || blank'
     ],
-    condition_value => [
+    v1 => [
       'not_blank'
     ],
-    operator => [
-      {in_array => $operators}
+    op => [
+      {in_array => $ops}
     ],
     'sort-key' => [
       'safety_name'
@@ -54,41 +54,41 @@
   
   # Paramters
   my $data = $vresult->data;
-  my $column = $data->{condition_column};
-  my $operator = $data->{operator};
-  my $value = $data->{condition_value};
+  my $column = $data->{c1};
+  my $op = $data->{op};
+  my $value = $data->{v1};
   
   my $charset = stash('charset');
   my $db_value;
   my $where;
-  if (defined $column && $column ne '' && defined $operator && $operator ne '') {
+  if (defined $column && $column ne '' && defined $op && $op ne '') {
     # Where
     $where = $dbi->where;
-    my $db_operator;
-    if ($operator eq 'contains') {
-      $db_operator = 'like';
+    my $db_op;
+    if ($op eq 'contains') {
+      $db_op = 'like';
       $db_value = "%$value%";
-      $where->clause(":${column}{$db_operator}");
+      $where->clause(":${column}{$db_op}");
     }
-    elsif ($operator eq 'in') {
+    elsif ($op eq 'in') {
       my $values = $value;
       $values =~ s/^ +//;
       $values =~ s/ +$//;
       my @values = split / +/, $values;
       $where = {$column => \@values};
     }
-    elsif ($operator eq 'is null' || $operator eq 'is not null') {
-      $where->clause("$column $operator");
+    elsif ($op eq 'is null' || $op eq 'is not null') {
+      $where->clause("$column $op");
     }
-    elsif ($operator eq 'is space' || $operator eq 'is not space') {
-      $db_operator = $operator eq 'is space' ? '=' : '<>';
+    elsif ($op eq 'is space' || $op eq 'is not space') {
+      $db_op = $op eq 'is space' ? '=' : '<>';
       $db_value = '';
-      $where->clause(":${column}{$db_operator}");
+      $where->clause(":${column}{$db_op}");
     }
     else {
-      $db_operator = $operator;
+      $db_op = $op;
       $db_value = $value;
-      $where->clause(":${column}{$db_operator}");
+      $where->clause(":${column}{$db_op}");
     }
     if (defined $db_value) {
       $db_value = Encode::encode($charset, $db_value) if defined $db_value;
@@ -191,12 +191,12 @@
   <div class="well well-small" style="background-color:white">
     <form method="get" action="<%= url_for %>" style="margin-bottom:5px">
       <div class="label">Condition</div>
-      % my $soperators = [@$operators];
-      % splice @$soperators, 0, 1, ['---' => ''];
+      % my $sops = [@$ops];
+      % splice @$sops, 0, 1, ['---' => ''];
       <div class="form-inline" style="margin-bottom:10px">
-        <%= select_field condition_column => [['---' => ''], sort @$header], style => "width:250px" %>
-        <%= select_field operator => $soperators, style => "width:130px" %>
-        <%= input_tag 'condition_value', style => "width:470px" %>
+        <%= select_field c1 => [['---' => ''], sort @$header], style => "width:250px" %>
+        <%= select_field op => $sops, style => "width:130px" %>
+        <%= input_tag 'v1', style => "width:470px" %>
         <%= hidden_field database => param('database') %>
         <%= hidden_field table => param('table') %>
       </div>
