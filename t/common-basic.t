@@ -461,6 +461,18 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
       [121, 1]
     ])
     ;
+    
+  # in
+  $model->delete_all;
+  $model->insert({k1 => 1, k2 => 1});
+  $model->insert({k1 => 2, k2 => 1});
+  $model->insert({k1 => 3, k2 => 1});
+  $t->get_ok("$url&$opt&table=table4&condition_column=k1&condition_value= 1  2 &operator=in")
+    ->json_is('/rows', [
+      [1, 1], 
+      [2, 1],
+    ])
+    ;
   
   # =
   $model->delete_all;

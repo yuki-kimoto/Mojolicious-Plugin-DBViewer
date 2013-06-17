@@ -70,6 +70,13 @@
       $db_value = "%$value%";
       $where->clause(":${column}{$db_operator}");
     }
+    elsif ($operator eq 'in') {
+      my $values = $value;
+      $values =~ s/^ +//;
+      $values =~ s/ +$//;
+      my @values = split / +/, $values;
+      $where = {$column => \@values};
+    }
     elsif ($operator eq 'is null' || $operator eq 'is not null') {
       $where->clause("$column $operator");
     }
