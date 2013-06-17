@@ -41,7 +41,7 @@
     op => [
       {in_array => $ops}
     ],
-    'sort-key' => [
+    'sk1' => [
       'safety_name'
     ],
   ];
@@ -97,12 +97,12 @@
   }
   
   # Order by
-  my $sort_key = $data->{'sort-key'};
+  my $sort_key = $data->{'sk1'};
   my $order_by = '';
   if (defined $sort_key) {
     $order_by = "order by $sort_key";
     
-    my $order = param('order') || '';
+    my $order = param('so1') || '';
     if ($order eq 'asc' || $order eq 'desc') {
       $order_by .= " $order";
     }
@@ -203,8 +203,8 @@
 
       <div class="label">Order</div>
       <div class="form-inline" style="margin-bottom:10px">
-        <%= select_field 'sort-key' => [['---' => ''], sort @$header], style => "width:250px" %>
-        <%= select_field 'order' => [['---' => ''], 'asc', 'desc'], style => "width:130px" %>
+        <%= select_field 'sk1' => [['---' => ''], sort @$header], style => "width:250px" %>
+        <%= select_field 'so1' => [['---' => ''], 'asc', 'desc'], style => "width:130px" %>
       </div>
       <div>
         <span class="label">

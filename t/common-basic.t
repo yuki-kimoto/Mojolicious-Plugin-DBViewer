@@ -410,7 +410,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
 # Condition
 {
   my $url = "/dbviewer/select?database=$database&table=table4";
-  my $opt = 'output=json&sort-key=k1&order=asc';
+  my $opt = 'output=json&sk1=k1&so=asc';
   eval { $dbi->execute('drop table table4') };
   $dbi->execute($create_table4);
   my $model = $dbi->create_model(table => 'table4');
