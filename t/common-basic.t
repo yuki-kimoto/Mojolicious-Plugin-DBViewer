@@ -103,7 +103,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table1&output=json")
 ;
 
 # Select page(JSON)
-$t->get_ok("/dbviewer/select?database=$database&table=table1&c1=column1_2&v1=4&op=like&output=json")
+$t->get_ok("/dbviewer/select?database=$database&table=table1&c1=column1_2&v1=4&op1=like&output=json")
   ->content_like(qr/column1_1/)
   ->content_like(qr/column1_2/)
   ->content_unlike(qr/\b2\b/)
@@ -421,7 +421,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   $model->insert({k1 => 21, k2 => 1});
   $model->insert({k1 => 121, k2 => 1});
   $model->insert({k1 => 3, k2 => 1});
-  $t->get_ok("$url&$opt&table=table4&c1=k1&v1=2&op=contains")
+  $t->get_ok("$url&$opt&table=table4&c1=k1&v1=2&op1=contains")
     ->json_is('/rows', [
       [2, 1], 
       [12, 1],
@@ -437,7 +437,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   $model->insert({k1 => 21, k2 => 1});
   $model->insert({k1 => 121, k2 => 1});
   $model->insert({k1 => 3, k2 => 1});
-  $t->get_ok("$url&$opt&table=table4&c1=k1&v1=%2%&op=contains")
+  $t->get_ok("$url&$opt&table=table4&c1=k1&v1=%2%&op1=contains")
     ->json_is('/rows', [
       [2, 1], 
       [12, 1],
@@ -453,7 +453,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   $model->insert({k1 => 21, k2 => 1});
   $model->insert({k1 => 121, k2 => 1});
   $model->insert({k1 => 3, k2 => 1});
-  $t->get_ok("$url&$opt&table=table4&c1=k1&v1=%2%&op=like")
+  $t->get_ok("$url&$opt&table=table4&c1=k1&v1=%2%&op1=like")
     ->json_is('/rows', [
       [2, 1], 
       [12, 1],
@@ -467,7 +467,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   $model->insert({k1 => 1, k2 => 1});
   $model->insert({k1 => 2, k2 => 1});
   $model->insert({k1 => 3, k2 => 1});
-  $t->get_ok("$url&$opt&table=table4&c1=k1&v1= 1  2 &op=in")
+  $t->get_ok("$url&$opt&table=table4&c1=k1&v1= 1  2 &op1=in")
     ->json_is('/rows', [
       [1, 1], 
       [2, 1],
@@ -478,7 +478,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   $model->delete_all;
   $model->insert({k1 => 2, k2 => 1});
   $model->insert({k1 => 12, k2 => 1});
-  $t->get_ok("$url&$opt&table=table4&c1=k1&v1=2&op==")
+  $t->get_ok("$url&$opt&table=table4&c1=k1&v1=2&op1==")
     ->json_is('/rows', [
       [2, 1], 
     ])
@@ -489,7 +489,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   $model->insert({k1 => 2, k2 => 1});
   $model->insert({k1 => 12, k2 => 1});
   $model->insert({k1 => 22, k2 => 1});
-  $t->get_ok("$url&$opt&table=table4&c1=k1&v1=12&op=<")
+  $t->get_ok("$url&$opt&table=table4&c1=k1&v1=12&op1=<")
     ->json_is('/rows', [
       [2, 1], 
     ])
@@ -500,7 +500,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   $model->insert({k1 => 2, k2 => 1});
   $model->insert({k1 => 12, k2 => 1});
   $model->insert({k1 => 22, k2 => 1});
-  $t->get_ok("$url&$opt&table=table4&c1=k1&v1=12&op=<=")
+  $t->get_ok("$url&$opt&table=table4&c1=k1&v1=12&op1=<=")
     ->json_is('/rows', [
       [2, 1], 
       [12, 1], 
@@ -512,7 +512,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   $model->insert({k1 => 2, k2 => 1});
   $model->insert({k1 => 12, k2 => 1});
   $model->insert({k1 => 22, k2 => 1});
-  $t->get_ok("$url&$opt&table=table4&c1=k1&v1=12&op=>")
+  $t->get_ok("$url&$opt&table=table4&c1=k1&v1=12&op1=>")
     ->json_is('/rows', [
       [22, 1], 
     ])
@@ -523,7 +523,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   $model->insert({k1 => 2, k2 => 1});
   $model->insert({k1 => 12, k2 => 1});
   $model->insert({k1 => 22, k2 => 1});
-  $t->get_ok("$url&$opt&table=table4&c1=k1&v1=12&op=>=")
+  $t->get_ok("$url&$opt&table=table4&c1=k1&v1=12&op1=>=")
     ->json_is('/rows', [
       [12, 1], 
       [22, 1], 
@@ -534,7 +534,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   $model->delete_all;
   $model->insert({k1 => 2, k2 => 1});
   $model->insert({k1 => undef, k2 => 1});
-  $t->get_ok("$url&$opt&table=table4&c1=k1&op=is null")
+  $t->get_ok("$url&$opt&table=table4&c1=k1&op1=is null")
     ->json_is('/rows', [
       [undef, 1], 
     ])
@@ -544,7 +544,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   $model->delete_all;
   $model->insert({k1 => 2, k2 => 1});
   $model->insert({k1 => undef, k2 => 1});
-  $t->get_ok("$url&$opt&table=table4&c1=k1&op=is not null")
+  $t->get_ok("$url&$opt&table=table4&c1=k1&op1=is not null")
     ->json_is('/rows', [
       [2, 1], 
     ])
@@ -554,7 +554,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   $model->delete_all;
   $model->insert({k1 => 2, k2 => 1});
   $model->insert({k1 => 2, k2 => ''});
-  $t->get_ok("$url&$opt&table=table4&c1=k2&op=is space")
+  $t->get_ok("$url&$opt&table=table4&c1=k2&op1=is space")
     ->json_is('/rows', [
       [2, ''], 
     ])
@@ -564,7 +564,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   $model->delete_all;
   $model->insert({k1 => 2, k2 => 1});
   $model->insert({k1 => 2, k2 => ''});
-  $t->get_ok("$url&$opt&table=table4&c1=k2&op=is not space")
+  $t->get_ok("$url&$opt&table=table4&c1=k2&op1=is not space")
     ->json_is('/rows', [
       [2, 1], 
     ])
