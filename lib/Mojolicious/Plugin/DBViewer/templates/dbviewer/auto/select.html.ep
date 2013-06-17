@@ -2,6 +2,7 @@
   use Data::Page ();
   use Mojo::JSON ();
   use Encode ();
+  use Data::Dumper ();
   
   # Command
   my $command = $dbviewer->command;
@@ -77,60 +78,89 @@
   my $table = $vparams->{table};
   
   # Paramters
-  my $column = $vparams->{c1};
-  my $op = $vparams->{op1};
-  my $value = $vparams->{v1};
 
   # DBI
   my $dbi = $dbviewer->dbi;
   
   my $union = 'and';
   my $charset = stash('charset');
-  my $db_value;
-  my $where;
-  if (defined $column && $column ne '' && defined $op && $op ne '') {
-    # Where
-    $where = $dbi->where;
+  my $where = $dbi->where;
+
+  my $merged_param = {};
+  my @clauses;
+  
+  for my $num (1 .. 3) {
+    my $column = $vparams->{"c$num"};
+    my $op = $vparams->{"op$num"};
+    my $value = $vparams->{"v$num"};
+
     my $db_op;
-    my $clause;
     my $param;
-    if ($op eq 'contains') {
-      $db_value = "%$value%";
-      $db_value = Encode::encode($charset, $db_value);
-      $clause = ":${column}{like}";
-      $param = {$column => $db_value};
-    }
-    elsif ($op eq 'in') {
-      my $values = $value;
-      $values =~ s/^ +//;
-      $values =~ s/ +$//;
-      my @values = split / +/, $values;
-      for my $value (@values) {
-        $value = Encode::encode($charset, $value);
+    my $clause;
+
+    if (defined $column && $column ne '' && defined $op && $op ne '') {
+
+      my $db_value;
+
+      if ($op eq 'contains') {
+        $db_value = "%$value%";
+        $db_value = Encode::encode($charset, $db_value);
+        $clause = ":${column}{like}";
+        $param = {$column => $db_value};
       }
-      $clause = "$column in (" . join(',', (":$column") x @values) . ")";
-      $param = {$column => \@values};
+      elsif ($op eq 'in') {
+        my $values = $value;
+        $values =~ s/^ +//;
+        $values =~ s/ +$//;
+        my @values = split / +/, $values;
+        for my $value (@values) {
+          $value = Encode::encode($charset, $value);
+        }
+        $clause = "$column in (" . join(',', (":$column") x @values) . ")";
+        $param = {$column => \@values};
+      }
+      elsif ($op eq 'is null' || $op eq 'is not null') {
+        $clause = "$column $op";
+        $param = {};
+      }
+      elsif ($op eq 'is space' || $op eq 'is not space') {
+        $db_op = $op eq 'is space' ? '=' : '<>';
+        $clause = "$column $db_op ''";
+        $param = {};
+      }
+      else {
+        $db_op = $op;
+        $db_value = $value;
+        $clause = ":${column}{$db_op}";
+        $db_value = Encode::encode($charset, $db_value) if defined $db_value;
+        $param = {$column => $db_value};
+      }
+      push @clauses, $clause;
+
+      for my $column (keys %$param) {
+        if (exists $merged_param->{$column}) {
+          if (ref $param->{$column} eq 'ARRAY') {
+            push @{$merged_param->{$column}}, @{$param->{$column}};
+          }
+          else {
+            push @{$merged_param->{$column}}, $param->{$column};
+          }
+        }
+        else {
+          if (ref $param->{$column} eq 'ARRAY') {
+            $merged_param->{$column} = [@{$param->{$column}}];
+          }
+          else {
+            $merged_param->{$column} = [$param->{$column}];
+          }
+        }
+      }
     }
-    elsif ($op eq 'is null' || $op eq 'is not null') {
-      $clause = "$column $op";
-      $param = {};
-    }
-    elsif ($op eq 'is space' || $op eq 'is not space') {
-      $db_op = $op eq 'is space' ? '=' : '<>';
-      $clause = "$column $db_op ''";
-      $param = {};
-    }
-    else {
-      $db_op = $op;
-      $db_value = $value;
-      $clause = ":${column}{$db_op}";
-      $db_value = Encode::encode($charset, $db_value) if defined $db_value;
-      $param = {$column => $db_value};
-    }
-    $where->clause($clause);
-    $where->param($param);
   }
   
+  $where->clause([$union, @clauses]);
+  $where->param($merged_param);
+
   # Order by
   my @order_bys;
   for my $num (1 .. 2) {
@@ -284,9 +314,10 @@
   <div class="well well-small">
     <div><b>Query</b></div>
     <div><%= $sql %></div>
-    % if (defined $db_value) {
-      <div><b>Parameter:</b> <%= $db_value eq '' ? '(Space)' : $db_value %></div>
-    % }
+    % local $Data::Dumper::Sortkeys = 1;
+    % my $param_dump = Data::Dumper::Dumper($merged_param);
+    % $param_dump =~ s/.+?= //;
+    <div><b>Parameter:</b> <%= $param_dump %></div>
   </div>
   
   <div>
