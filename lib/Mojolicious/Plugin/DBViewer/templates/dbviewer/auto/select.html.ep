@@ -84,6 +84,7 @@
   # DBI
   my $dbi = $dbviewer->dbi;
   
+  my $union = 'and';
   my $charset = stash('charset');
   my $db_value;
   my $where;
@@ -91,11 +92,13 @@
     # Where
     $where = $dbi->where;
     my $db_op;
+    my $clause;
+    my $param;
     if ($op eq 'contains') {
       $db_value = "%$value%";
       $db_value = Encode::encode($charset, $db_value);
-      $where->clause(":${column}{like}");
-      $where->param({$column => $db_value});
+      $clause = ":${column}{like}";
+      $param = {$column => $db_value};
     }
     elsif ($op eq 'in') {
       my $values = $value;
@@ -105,25 +108,27 @@
       for my $value (@values) {
         $value = Encode::encode($charset, $value);
       }
-      my $clause = "$column in (" . join(',', (":$column") x @values) . ")";
-      $where->clause($clause);
-      $where->param({$column => \@values});
+      $clause = "$column in (" . join(',', (":$column") x @values) . ")";
+      $param = {$column => \@values};
     }
     elsif ($op eq 'is null' || $op eq 'is not null') {
-      $where->clause("$column $op");
-      $where->param({});
+      $clause = "$column $op";
+      $param = {};
     }
     elsif ($op eq 'is space' || $op eq 'is not space') {
       $db_op = $op eq 'is space' ? '=' : '<>';
-      $where->clause("$column $db_op ''");
+      $clause = "$column $db_op ''";
+      $param = {};
     }
     else {
       $db_op = $op;
       $db_value = $value;
-      $where->clause(":${column}{$db_op}");
+      $clause = ":${column}{$db_op}";
       $db_value = Encode::encode($charset, $db_value) if defined $db_value;
-      $where->param({$column => $db_value});
+      $param = {$column => $db_value};
     }
+    $where->clause($clause);
+    $where->param($param);
   }
   
   # Order by
