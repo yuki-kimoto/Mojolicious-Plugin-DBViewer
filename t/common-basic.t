@@ -102,8 +102,6 @@ $t->get_ok("/dbviewer/select?database=$database&table=table1&output=json")
   ->content_like(qr/4/)
 ;
 
-__END__
-
 # Select page(JSON)
 $t->get_ok("/dbviewer/select?database=$database&table=table1&condition_column=column1_2&condition_value=4&operator=like&output=json")
   ->content_like(qr/column1_1/)
