@@ -187,7 +187,7 @@
       % my $soperators = [@$operators];
       % splice @$soperators, 0, 1, ['---' => ''];
       <div class="form-inline" style="margin-bottom:10px">
-        <%= select_field condition_column => [['---' => ''], @$header], style => "width:250px" %>
+        <%= select_field condition_column => [['---' => ''], sort @$header], style => "width:250px" %>
         <%= select_field operator => $soperators, style => "width:130px" %>
         <%= input_tag 'condition_value', style => "width:470px" %>
         <%= hidden_field database => param('database') %>
@@ -196,7 +196,7 @@
 
       <div class="label">Order</div>
       <div class="form-inline" style="margin-bottom:10px">
-        <%= select_field 'sort-key' => [['---' => ''], @$header], style => "width:250px" %>
+        <%= select_field 'sort-key' => [['---' => ''], sort @$header], style => "width:250px" %>
         <%= select_field 'order' => [['---' => ''], 'asc', 'desc'], style => "width:130px" %>
       </div>
       <div>
