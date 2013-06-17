@@ -72,17 +72,17 @@
     ]
   ];
   my $vresult = $dbviewer->validator->validate($params, $rule);
-  my $vparamsbase = $vresult->data->{database};
-  my $table = $vresult->data->{table};
-  
-  # DBI
-  my $dbi = $dbviewer->dbi;
+  my $vparams = $vresult->data;
+  my $database = $vparams->{database};
+  my $table = $vparams->{table};
   
   # Paramters
-  my $vparams = $vresult->data;
   my $column = $vparams->{c1};
   my $op = $vparams->{op1};
   my $value = $vparams->{v1};
+
+  # DBI
+  my $dbi = $dbviewer->dbi;
   
   my $charset = stash('charset');
   my $db_value;
@@ -92,31 +92,35 @@
     $where = $dbi->where;
     my $db_op;
     if ($op eq 'contains') {
-      $db_op = 'like';
       $db_value = "%$value%";
-      $where->clause(":${column}{$db_op}");
+      $db_value = Encode::encode($charset, $db_value);
+      $where->clause(":${column}{like}");
+      $where->param({$column => $db_value});
     }
     elsif ($op eq 'in') {
       my $values = $value;
       $values =~ s/^ +//;
       $values =~ s/ +$//;
       my @values = split / +/, $values;
-      $where = {$column => \@values};
+      for my $value (@values) {
+        $value = Encode::encode($charset, $value);
+      }
+      my $clause = "$column in (" . join(',', (":$column") x @values) . ")";
+      $where->clause($clause);
+      $where->param({$column => \@values});
     }
     elsif ($op eq 'is null' || $op eq 'is not null') {
       $where->clause("$column $op");
+      $where->param({});
     }
     elsif ($op eq 'is space' || $op eq 'is not space') {
       $db_op = $op eq 'is space' ? '=' : '<>';
-      $db_value = '';
-      $where->clause(":${column}{$db_op}");
+      $where->clause("$column $db_op ''");
     }
     else {
       $db_op = $op;
       $db_value = $value;
       $where->clause(":${column}{$db_op}");
-    }
-    if (defined $db_value) {
       $db_value = Encode::encode($charset, $db_value) if defined $db_value;
       $where->param({$column => $db_value});
     }
@@ -141,9 +145,9 @@
   my $count = 100;
   my $offset = ($page - 1) * $count;
   
-  # Get null allowed columns
+  # Select
   my $result = $dbi->select(
-    table => "$vparamsbase.$table",
+    table => "$database.$table",
     where => $where,
     append => "$order_by limit $offset, $count"
   );
@@ -154,7 +158,7 @@
   # Pager
   my $total = $dbi->select(
     'count(*)',
-    table => "$vparamsbase.$table",
+    table => "$database.$table",
     where => $where
   )->value;
   my $pager = Data::Page->new($total, $count, $page);
@@ -267,6 +271,8 @@
         % }
       </div>
       <div><%= submit_button 'Execute', class => 'btn', style => "margin-top:5px;width:150px" %></div>
+      %= hidden_field database => scalar param('database');
+      %= hidden_field table => scalar param('table');
     </form>
   </div>
 
