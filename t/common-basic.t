@@ -569,7 +569,29 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
       [2, 1], 
     ])
     ;
+}
 
+# Order
+{
+  my $url = "/dbviewer/select?database=$database&table=table4";
+  my $opt = 'output=json';
+  eval { $dbi->execute('drop table table4') };
+  $dbi->execute($create_table4);
+  my $model = $dbi->create_model(table => 'table4');
+  
+  # Two order
+  $model->insert({k1 => 1, k2 => 3});
+  $model->insert({k1 => 1, k2 => 4});
+  $model->insert({k1 => 2, k2 => 3});
+  $model->insert({k1 => 2, k2 => 4});
+  $t->get_ok("$url&$opt&table=table4&sk1=k1&so1=desc&sk2=k2&so2=desc")
+    ->json_is('/rows', [
+      [2, 4], 
+      [2, 3],
+      [1, 4],
+      [1, 3]
+    ])
+    ;
 }
 
 # Empty prefix
