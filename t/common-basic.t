@@ -3,6 +3,8 @@ use strict;
 use warnings;
 use DBIx::Custom;
 use Test::Mojo;
+use utf8;
+use Encode qw/encode decode/;
 
 no warnings 'once';
 
@@ -567,6 +569,54 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   $t->get_ok("$url&$opt&table=table4&c1=k2&op1=is not space")
     ->json_is('/rows', [
       [2, 1], 
+    ])
+    ;
+  
+  # Multiple condtions(or)
+  $model->delete_all;
+  $model->insert({k1 => 1, k2 => 1});
+  $model->insert({k1 => 2, k2 => 1});
+  $model->insert({k1 => 3, k2 => 1});
+  $model->insert({k1 => 4, k2 => 1});
+  $model->insert({k1 => 5, k2 => 1});
+  
+  $t->get_ok("$url&$opt&table=table4&u=or&c1=k1&op1==&v1=1&c2=k1&op2=in&v2=2 3&c3=k1&op3==&v3=4")
+    ->json_is('/rows', [
+      [1, 1], 
+      [2, 1], 
+      [3, 1], 
+      [4, 1], 
+    ])
+    ;
+
+  # Multiple condtions(and)
+  $model->delete_all;
+  $model->insert({k1 => 1, k2 => 1});
+  $model->insert({k1 => 2, k2 => 2});
+  $model->insert({k1 => 3, k2 => 1});
+  $model->insert({k1 => 4, k2 => 1});
+  $model->insert({k1 => 5, k2 => 1});
+  
+  $t->get_ok("$url&$opt&table=table4&u=and&c1=k1&op1==&v1=2&c2=k2&op2=in&v2=2")
+    ->json_is('/rows', [
+      [2, 2], 
+    ])
+    ;
+    
+  # Multiple condtions(charset)
+  $model->delete_all;
+  $model->insert({k1 => 1, k2 => encode('UTF-8', 'あ')});
+  $model->insert({k1 => 2, k2 => encode('UTF-8', 'い')});
+  $model->insert({k1 => 3, k2 => encode('UTF-8', 'う')});
+  $model->insert({k1 => 4, k2 => encode('UTF-8', 'え')});
+  $model->insert({k1 => 5, k2 => encode('UTF-8', 'お')});
+
+  $t->get_ok("$url&$opt&table=table4&u=or&c1=k2&op1=contains&v1=あ&c2=k2&op2=in&v2=い う&c3=k2&op3==&v3=え");
+  $t->json_is('/rows', [
+      [1, 'あ'], 
+      [2, 'い'], 
+      [3, 'う'], 
+      [4, 'え'], 
     ])
     ;
 }

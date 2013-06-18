@@ -70,6 +70,9 @@
     ],
     so2 => [
       'any'
+    ],
+    u => {default => 'and'} => [
+      {in_array => ['and', 'or']}
     ]
   ];
   my $vresult = $dbviewer->validator->validate($params, $rule);
@@ -82,7 +85,7 @@
   # DBI
   my $dbi = $dbviewer->dbi;
   
-  my $union = 'and';
+  my $union = $vparams->{u};
   my $charset = stash('charset');
   my $where = $dbi->where;
 
@@ -203,6 +206,11 @@
   
   my $output = param('output') || '';
   if ($output eq 'json') {
+    for my $row (@$rows) {
+      for my $column (@$row) {
+        $column = Encode::decode($charset, $column);
+      }
+    }
     $self->render(json => {header => $header, rows => $rows});
     $self->finish_rendering;
     return;
@@ -257,7 +265,10 @@
   
   <div class="well well-small" style="background-color:white">
     <form method="get" action="<%= url_for %>" style="margin-bottom:5px">
-      <div class="label">Condition</div>
+      <div>
+        <span class="label">Condition</span>
+        <%= select_field u => ['and', 'or'], style => "width:70px" %>
+      </div>
       % my $sops = [@$ops];
       % splice @$sops, 0, 1, ['---' => ''];
       <div class="form-inline" style="margin-bottom:1px">
@@ -336,9 +347,9 @@
       % my $row = $rows->[$i];
       <tr class="row-<%= $i + 1 %>">
         % for (my $k = 0; $k < @$row; $k++) {
-          % my $vparams = Encode::decode($charset, $row->[$k]);
+          % my $value = Encode::decode($charset, $row->[$k]);
           % my $h = $header->[$k];
-          <td class="column-<%= $h %> column-<%= $k + 1 %>"><%= $vparams %></td>
+          <td class="column-<%= $h %> column-<%= $k + 1 %>"><%= $value %></td>
         % }
       </tr>
     % }
