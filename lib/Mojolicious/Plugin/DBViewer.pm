@@ -47,7 +47,7 @@ sub register {
   $validator->register_constraint(
     safety_name => sub {
       my $name = shift;
-      return ($name || '') =~ /^\w+$/ ? 1 : 0;
+      return ($name || '') =~ /^[a-zA-Z0-9_\.]+$/ ? 1 : 0;
     }
   );
   $self->validator($validator);
