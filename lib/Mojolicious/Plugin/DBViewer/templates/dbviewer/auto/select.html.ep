@@ -201,6 +201,7 @@
   my $select_columns = [];
   my $table_columns = [];
   if ($join_mode) {
+
     for my $t ($table, @$joined_tables) {
       my $columns = [];
       my $result = $dbi->select(table => "$database.$t", where => '1 <> 1');

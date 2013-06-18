@@ -730,3 +730,51 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
     ->content_unlike(qr/column2_2/)
     ->content_like(qr/table3/);
 }
+
+# Join
+{
+  package Test5;
+  use Mojolicious::Lite;
+  my $connector;
+  plugin(
+    'DBViewer',
+    dsn => $dsn,
+    user => $user,
+    password => $password,
+    connector_get => \$connector,
+    join => {
+      table1 => [
+        'left join table2 on table1.column1_2 = table2.column2_1',
+        'left join table3 on table2.column2_2 = table3.column3_1'
+      ]
+    }
+  );
+
+  my $dbi = DBIx::Custom->connect(connector => $connector);
+
+  my $app = Test5->new;
+  my $t = Test::Mojo->new($app);
+
+  # Prepare database
+  eval { $dbi->execute('drop table table1') };
+  eval { $dbi->execute('drop table table2') };
+  eval { $dbi->execute('drop table table3') };
+
+  $dbi->execute($create_table1);
+  $dbi->execute($create_table2);
+  $dbi->execute($create_table3);
+
+  # Conditions
+  my $url = "/dbviewer/select?database=$database&table=table1";
+  $dbi->insert({column1_1 => 1, column1_2 => 3}, table => 'table1');
+  $dbi->insert({column1_1 => 2, column1_2 => 3}, table => 'table1');
+  $dbi->insert({column1_1 => 7, column1_2 => 1}, table => 'table1');
+  $dbi->insert({column2_1 => 3, column2_2 => 4}, table => 'table2');
+  $dbi->insert({column3_1 => 4, column3_2 => 5}, table => 'table3');
+  $t->get_ok("$url&output=json&j=1&c1=table3.column3_2&op1==&v1=5&sk1=table1.column1_1&so1=desc");
+  $t->json_is('/rows', [
+      [2, 3, 3, 4, 4, 5], 
+      [1, 3, 3, 4, 4, 5]
+    ])
+    ;
+}
