@@ -116,7 +116,8 @@ sub register {
       charset => $charset,
       footer_text => $footer_text,
       footer_link => $footer_link,
-      utilities => $utilities
+      utilities => $utilities,
+      join => $conf->{join} || {}
     );
     
     # Auto Route

@@ -73,6 +73,9 @@
     ],
     u => {default => 'and'} => [
       {in_array => ['and', 'or']}
+    ],
+    j => [
+      'any'
     ]
   ];
   my $vresult = $dbviewer->validator->validate($params, $rule);
@@ -316,9 +319,26 @@
           </label>
         % }
       </div>
+      <div>
+        % if ($join->{$table}) {
+          <div>
+            <span class="label" style="margin-right:5px">
+              Join mode
+            </span>
+            <span>
+              % if (scalar param('j')) {
+                <a href="<%= url_with->query([j => '']) %>">Off</a>
+              % } else {
+                <a href="<%= url_with->query([j => 1]) %>">On</a>
+              % }
+            </span>
+          </div>
+        % }
+      </div>   
       <div><%= submit_button 'Execute', class => 'btn', style => "margin-top:5px;width:150px" %></div>
       %= hidden_field database => scalar param('database');
       %= hidden_field table => scalar param('table');
+      %= hidden_field j => scalar param('j');
     </form>
   </div>
 
@@ -365,14 +385,14 @@
     <div class="pagination pagination-centered">
       <ul>
         <li>
-          <a style="color:#6666FF;font-size:70%" href="<%= url_for->query($self->req->params->clone)->query([page => 1]) %>">
+          <a style="color:#6666FF;font-size:70%" href="<%= url_with->query([page => 1]) %>">
             Fisrt
           </a>
         </li>
         % my $prev_page = $current_page - 1;
         % $prev_page = 1 if $prev_page < 1;
         <li>
-          <a href="<%= url_for->query($self->req->params->clone)->query([page => $current_page - 1]) %>">
+          <a href="<%= url_with->query([page => $current_page - 1]) %>">
             <b>&laquo;</b>
           </a>
         </li>
@@ -389,7 +409,7 @@
         % }
         % for my $page ($navi_first_page .. $navi_last_page) {
           <li class="<%= $page == $current_page ? 'active' : 'disable' %>">
-            <a href="<%= url_for->query($self->req->params->clone)->query([page => $page]) %>">
+            <a href="<%= url_with->query([page => $page]) %>">
               <%= $page %>
             </a>
           </li>
@@ -397,12 +417,12 @@
         % my $next_page = $current_page + 1;
         % $next_page = $last_page if $next_page > $last_page;
         <li>
-          <a href="<%= url_for->query($self->req->params->clone)->query([page => $next_page]) %>">
+          <a href="<%= url_with->query([page => $next_page]) %>">
             <b>&raquo;</b>
           </a>
         </li>
         <li>
-          <a style="color:#6666FF;font-size:70%" href="<%= url_for->query($self->req->params->clone)->query([page => $last_page]) %>">
+          <a style="color:#6666FF;font-size:70%" href="<%= url_with->query([page => $last_page]) %>">
              Last
           </a>
         </li>
