@@ -1,3 +1,7 @@
+0.25
+  - catch up with Mojolicious::Plugin::AutoRoute version up.
+0.24
+  - fix column in select field not sorted bug
 0.23
   - fix column not shown bug.
 0.22
