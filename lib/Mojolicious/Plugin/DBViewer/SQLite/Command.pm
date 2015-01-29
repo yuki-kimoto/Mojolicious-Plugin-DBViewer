@@ -81,9 +81,11 @@ EOS
   my $create_table = $self->dbi->execute($sql)->value;
   
   # Format
-  $create_table =~ s/\(/(\n  /;
-  $create_table =~ s/, /,\n  /g;
-  $create_table =~ s/\)$/\n)/;
+  if (defined $create_table) {
+    $create_table =~ s/\(/(\n  /;
+    $create_table =~ s/, /,\n  /g;
+    $create_table =~ s/\)$/\n)/;
+  }
   
   return $create_table;
 }

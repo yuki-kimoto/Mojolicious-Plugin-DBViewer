@@ -94,7 +94,7 @@ $t->link_ok("/dbviewer/table?database=$database&table=table1");
 $t->get_ok("/dbviewer/select?database=$database&table=table1");
 $t->content_like(qr/Select.*table1/s);
 $t->content_like(qr#<option value="column1_1">column1_1</option>#);
-$t->content_like(qr#<input name="h" type="checkbox" value="1" /> column1_1#);
+$t->content_like(qr#<input name="h" type="checkbox" value="1"( /)?> column1_1#);
 
 # Select page(JSON)
 $t->get_ok("/dbviewer/select?database=$database&table=table1&output=json")
@@ -775,7 +775,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
   $dbi->insert({column3_1 => 4, column3_2 => 5}, table => 'table3');
   $t->get_ok("$url&j=1&c1=table3.column3_2&op1==&v1=5&sk1=table1.column1_1&so1=desc");
   $t->content_like(qr#<option value="table1\.column1_1">table1\.column1_1</option>#);
-  $t->content_like(qr#<input name="h" type="checkbox" value="1" /> table1\.column1_1#);
+  $t->content_like(qr#<input name="h" type="checkbox" value="1"( /)?> table1\.column1_1#);
   $t->get_ok("$url&output=json&j=1&c1=table3.column3_2&op1==&v1=5&sk1=table1.column1_1&so1=desc");
   $t->json_is('/rows', [
       [2, 3, 3, 4, 4, 5], 
