@@ -413,7 +413,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
 
 # Condition
 {
-  my $url = "/dbviewer/select?database=$database&table=table4";
+  my $url = "/dbviewer/select?database=$database";
   my $opt = 'output=json&sk1=k1&so=asc';
   eval { $dbi->execute('drop table table4') };
   $dbi->execute($create_table4);
@@ -625,7 +625,7 @@ $t->get_ok("/dbviewer/select?database=$database&table=table_page")
 
 # Order
 {
-  my $url = "/dbviewer/select?database=$database&table=table4";
+  my $url = "/dbviewer/select?database=$database";
   my $opt = 'output=json';
   eval { $dbi->execute('drop table table4') };
   $dbi->execute($create_table4);
