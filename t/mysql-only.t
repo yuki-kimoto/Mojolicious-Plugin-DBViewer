@@ -4,6 +4,7 @@ use warnings;
 use DBIx::Custom;
 use Test::Mojo;
 use Mojo::HelloWorld;
+use FindBin;
 
 my $test_run = -f "$FindBin::Bin/run/mysql-only.run" ? 1 : 0;
 my $test_skip_message = 'mysql private test';

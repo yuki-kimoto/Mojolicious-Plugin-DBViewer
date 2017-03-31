@@ -15,9 +15,9 @@ WriteMakefile(
     PREREQ_PM => {
         'Test::More'        => 0,
         'Mojolicious'       => '2.59',
-        'DBIx::Custom'      => '0.25',
+        'DBIx::Custom'      => '0.40',
         'Data::Page'        => '2.02',
-        'Validator::Custom' => '0.15',
+        'Validator::Custom' => '1.0201',
         'DBIx::Connector'   => '0.52',
         'Mojolicious::Plugin::AutoRoute' => '0.12'
     },

@@ -24,7 +24,7 @@ sub show_null_allowed_column {
   my @lines = split(/\n/, $show_create_table);
   my $null_allowed_column = [];
   for my $line (@lines) {
-    next if /^\s*`/ || $line =~ /NOT\s+NULL/i;
+    next if $line =~ /NOT\s+NULL/i;
     if ($line =~ /^\s+(`\w+?`)/) {
       push @$null_allowed_column, $1;
     }
