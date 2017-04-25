@@ -7,7 +7,7 @@ use DBIx::Custom;
 use Validator::Custom;
 use Carp 'croak';
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 has 'command';
 has 'prefix';

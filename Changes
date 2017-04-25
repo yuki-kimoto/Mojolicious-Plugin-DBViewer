@@ -1,3 +1,5 @@
+0.29 2017-03-31
+  - Support DBIx::Custom 0.40, Validator::Custom 1.0201
 0.28
   - Catch up Mojolicious 6
 0.27
