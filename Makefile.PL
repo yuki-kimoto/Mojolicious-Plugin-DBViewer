@@ -21,6 +21,18 @@ WriteMakefile(
         'DBIx::Connector'   => '0.52',
         'Mojolicious::Plugin::AutoRoute' => '0.12'
     },
+    META_MERGE   => {
+        resources => {
+            bugtracker  => {
+                web => 'https://github.com/yuki-kimoto/Mojolicious-Plugin-DBViewer/issues',
+            },
+            repository  => {
+                url => 'git@github.com:yuki-kimoto/Mojolicious-Plugin-DBViewer.git',
+                web => 'https://github.com/yuki-kimoto/Mojolicious-Plugin-DBViewer',
+                type => 'git',
+            },
+        },
+    },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Mojolicious-Plugin-DBViewer-*' },
 );
